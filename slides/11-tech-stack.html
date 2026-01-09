@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Technical Stack Summary</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&amp;family=JetBrains+Mono:wght@400;700&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Noto Sans KR", sans-serif;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        background-color: #0f172a;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+      }
+      .slide-container {
+        width: 1280px;
+        height: 720px;
+        background-color: #0f172a;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        overflow: visible;
+      }
+
+      /* Background Elements */
+      .bg-pattern {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0.03;
+        z-index: 0;
+        background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      }
+      .decor-circle {
+        position: absolute;
+        border-radius: 50%;
+        z-index: 1;
+        filter: blur(80px);
+      }
+      .circle-1 {
+        width: 500px;
+        height: 500px;
+        background-color: #3b82f6;
+        opacity: 0.04;
+        top: -100px;
+        right: -100px;
+      }
+      .circle-2 {
+        width: 300px;
+        height: 300px;
+        background-color: #8b5cf6;
+        opacity: 0.04;
+        bottom: 50px;
+        left: -50px;
+      }
+
+      /* Header */
+      .header-section {
+        padding: 50px 80px 20px 80px;
+        z-index: 10;
+      }
+
+      .section-tag {
+        background-color: rgba(99, 102, 241, 0.1);
+        color: #818cf8;
+        padding: 6px 12px;
+        border-radius: 4px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        display: inline-block;
+        margin-bottom: 15px;
+        border: 1px solid rgba(129, 140, 248, 0.2);
+      }
+
+      .main-title {
+        font-size: 2.8rem;
+        font-weight: 900;
+        color: #f8fafc;
+        margin: 0;
+        line-height: 1.2;
+      }
+
+      /* Three Columns Layout */
+      .content-section {
+        flex: 1;
+        padding: 20px 80px 60px 80px;
+        z-index: 10;
+        display: flex;
+        gap: 30px;
+        align-items: stretch;
+      }
+
+      .tech-card {
+        flex: 1;
+        background-color: rgba(30, 41, 59, 0.4);
+        border: 1px solid rgba(148, 163, 184, 0.1);
+        border-radius: 20px;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        backdrop-filter: blur(10px);
+      }
+
+      .tech-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px -10px rgba(0, 0, 0, 0.4);
+        background-color: rgba(30, 41, 59, 0.6);
+      }
+
+      /* Card Header with Icon */
+      .card-header {
+        padding: 30px 30px 20px 30px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+        position: relative;
+      }
+
+      .card-accent {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+      }
+
+      .icon-wrapper {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        margin-bottom: 15px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .card-title {
+        font-size: 1.4rem;
+        font-weight: 800;
+        color: #f1f5f9;
+        margin: 0;
+        letter-spacing: -0.01em;
+      }
+
+      /* Content List */
+      .card-body {
+        padding: 25px 30px;
+        flex: 1;
+      }
+
+      .tech-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      .tech-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 14px;
+        color: #cbd5e1;
+        font-size: 1rem;
+        line-height: 1.4;
+      }
+
+      .tech-item:last-child {
+        margin-bottom: 0;
+      }
+
+      .item-icon {
+        margin-right: 12px;
+        font-size: 0.9rem;
+        width: 20px;
+        text-align: center;
+      }
+
+      .tech-name {
+        font-weight: 500;
+      }
+
+      .tech-version {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.85rem;
+        opacity: 0.7;
+        margin-left: 6px;
+        background-color: rgba(255, 255, 255, 0.1);
+        padding: 1px 5px;
+        border-radius: 4px;
+      }
+
+      /* Specific Color Themes */
+
+      /* Backend - Blue */
+      .theme-backend .card-accent {
+        background-color: #3b82f6;
+      }
+      .theme-backend .icon-wrapper {
+        background-color: rgba(59, 130, 246, 0.1);
+        color: #60a5fa;
+      }
+      .theme-backend .card-header {
+        background: linear-gradient(
+          to bottom,
+          rgba(59, 130, 246, 0.05),
+          transparent
+        );
+      }
+      .theme-backend .item-icon {
+        color: #60a5fa;
+      }
+      .theme-backend:hover {
+        border-color: rgba(59, 130, 246, 0.3);
+      }
+
+      /* Data - Emerald */
+      .theme-data .card-accent {
+        background-color: #10b981;
+      }
+      .theme-data .icon-wrapper {
+        background-color: rgba(16, 185, 129, 0.1);
+        color: #34d399;
+      }
+      .theme-data .card-header {
+        background: linear-gradient(
+          to bottom,
+          rgba(16, 185, 129, 0.05),
+          transparent
+        );
+      }
+      .theme-data .item-icon {
+        color: #34d399;
+      }
+      .theme-data:hover {
+        border-color: rgba(16, 185, 129, 0.3);
+      }
+
+      /* DevOps - Violet */
+      .theme-devops .card-accent {
+        background-color: #8b5cf6;
+      }
+      .theme-devops .icon-wrapper {
+        background-color: rgba(139, 92, 246, 0.1);
+        color: #a78bfa;
+      }
+      .theme-devops .card-header {
+        background: linear-gradient(
+          to bottom,
+          rgba(139, 92, 246, 0.05),
+          transparent
+        );
+      }
+      .theme-devops .item-icon {
+        color: #a78bfa;
+      }
+      .theme-devops:hover {
+        border-color: rgba(139, 92, 246, 0.3);
+      }
+
+      .page-indicator {
+        position: absolute;
+        bottom: 30px;
+        right: 40px;
+        color: #475569;
+        font-size: 0.9rem;
+        font-weight: 500;
+      }
+
+      /* Navigation Bar - 오른쪽 하단에 조용하게 */
+      .nav-bar {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background-color: rgba(15, 23, 42, 0.6);
+        border: 1px solid rgba(148, 163, 184, 0.15);
+        border-radius: 12px;
+        padding: 8px 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        z-index: 1000;
+        backdrop-filter: blur(8px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        opacity: 0.7;
+        transition: opacity 0.3s ease;
+      }
+
+      .nav-bar:hover {
+        opacity: 1;
+      }
+
+      .nav-button {
+        background-color: transparent;
+        border: none;
+        color: #94a3b8;
+        padding: 6px 10px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.85rem;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-family: "Noto Sans KR", sans-serif;
+        min-width: auto;
+      }
+
+      .nav-button:hover:not(:disabled) {
+        background-color: rgba(59, 130, 246, 0.15);
+        color: #60a5fa;
+      }
+
+      .nav-button:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+      }
+
+      .nav-page-info {
+        color: #64748b;
+        font-size: 0.8rem;
+        font-weight: 500;
+        padding: 0 8px;
+        white-space: nowrap;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="slide-container">
+      <!-- Background Elements -->
+      <div class="bg-pattern"></div>
+      <div class="decor-circle circle-1"></div>
+      <div class="decor-circle circle-2"></div>
+      <!-- Header -->
+      <div class="header-section">
+        <div class="section-tag">TECHNOLOGY STACK</div>
+        <h1 class="main-title">기술 스택 요약</h1>
+      </div>
+      <!-- Content Section -->
+      <div class="content-section">
+        <!-- Column 1: Backend -->
+        <div class="tech-card theme-backend">
+          <div class="card-accent"></div>
+          <div class="card-header">
+            <div class="icon-wrapper">
+              <i class="fa-brands fa-java"></i>
+            </div>
+            <h2 class="card-title">Backend Application</h2>
+          </div>
+          <div class="card-body">
+            <ul class="tech-list">
+              <li class="tech-item">
+                <i class="fa-solid fa-check item-icon"></i>
+                <span class="tech-name">Java</span>
+                <span class="tech-version">17 LTS</span>
+              </li>
+              <li class="tech-item">
+                <i class="fa-solid fa-check item-icon"></i>
+                <span class="tech-name">Spring Boot</span>
+                <span class="tech-version">3.2.0</span>
+              </li>
+              <li class="tech-item">
+                <i class="fa-solid fa-check item-icon"></i>
+                <span class="tech-name">Spring Security &amp; JWT</span>
+              </li>
+              <li class="tech-item">
+                <i class="fa-solid fa-check item-icon"></i>
+                <span class="tech-name">Spring Data JPA</span>
+              </li>
+              <li class="tech-item">
+                <i class="fa-solid fa-check item-icon"></i>
+                <span class="tech-name">WebSocket (STOMP)</span>
+              </li>
+              <li class="tech-item">
+                <i class="fa-solid fa-check item-icon"></i>
+                <span class="tech-name">Spring WebFlux</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <!-- Column 2: Data & Cache -->
+        <div class="tech-card theme-data">
+          <div class="card-accent"></div>
+          <div class="card-header">
+            <div class="icon-wrapper">
+              <i class="fa-solid fa-database"></i>
+            </div>
+            <h2 class="card-title">Data &amp; Cache</h2>
+          </div>
+          <div class="card-body">
+            <ul class="tech-list">
+              <li class="tech-item">
+                <i class="fa-solid fa-check item-icon"></i>
+                <span class="tech-name">MySQL</span>
+                <span class="tech-version">8.0+</span>
+              </li>
+              <li class="tech-item">
+                <i class="fa-solid fa-caret-right item-icon"></i>
+                <span
+                  class="tech-name"
+                  style="font-size: 0.95em; color: #94a3b8"
+                  >RDS Aurora Global Cluster</span
+                >
+              </li>
+              <li class="tech-item">
+                <i class="fa-solid fa-check item-icon"></i>
+                <span class="tech-name">Redis / Valkey</span>
+                <span class="tech-version">7.x</span>
+              </li>
+              <li class="tech-item">
+                <i class="fa-solid fa-caret-right item-icon"></i>
+                <span
+                  class="tech-name"
+                  style="font-size: 0.95em; color: #94a3b8"
+                  >ElastiCache Multi-AZ</span
+                >
+              </li>
+              <li class="tech-item">
+                <i class="fa-solid fa-check item-icon"></i>
+                <span class="tech-name">AWS S3</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <!-- Column 3: DevOps & Infra -->
+        <div class="tech-card theme-devops">
+          <div class="card-accent"></div>
+          <div class="card-header">
+            <div class="icon-wrapper">
+              <i class="fa-solid fa-cloud"></i>
+            </div>
+            <h2 class="card-title">DevOps &amp; Infra</h2>
+          </div>
+          <div class="card-body">
+            <ul class="tech-list">
+              <li class="tech-item">
+                <i class="fa-solid fa-check item-icon"></i>
+                <span class="tech-name">Docker &amp; Kubernetes</span>
+              </li>
+              <li class="tech-item">
+                <i class="fa-solid fa-check item-icon"></i>
+                <span class="tech-name">AWS EKS</span>
+                <span class="tech-version">1.28+</span>
+              </li>
+              <li class="tech-item">
+                <i class="fa-solid fa-check item-icon"></i>
+                <span class="tech-name">Helm Charts</span>
+              </li>
+              <li class="tech-item">
+                <i class="fa-solid fa-check item-icon"></i>
+                <span class="tech-name">Terraform (IaC)</span>
+              </li>
+              <li class="tech-item">
+                <i class="fa-solid fa-check item-icon"></i>
+                <span class="tech-name">ArgoCD (GitOps)</span>
+              </li>
+              <li class="tech-item">
+                <i class="fa-solid fa-check item-icon"></i>
+                <span class="tech-name">Prometheus &amp; Grafana</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Navigation Bar - 페이지 오른쪽 하단 -->
+    <div class="nav-bar">
+      <button
+        class="nav-button"
+        onclick="window.goToPreviousSlide()"
+        id="prevBtn"
+        title="이전 슬라이드"
+      >
+        <i class="fa-solid fa-chevron-left"></i>
+      </button>
+      <div class="nav-page-info">
+        <span id="currentPage">11</span> / <span id="totalPages">19</span>
+      </div>
+      <button
+        class="nav-button"
+        onclick="window.goToNextSlide()"
+        id="nextBtn"
+        title="다음 슬라이드"
+      >
+        <i class="fa-solid fa-chevron-right"></i>
+      </button>
+    </div>
+    <script src="../assets/js/navigation.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const current = window.getCurrentSlideNumber();
+        const total = window.getTotalSlides();
+        document.getElementById("currentPage").textContent = current;
+        document.getElementById("totalPages").textContent = total;
+        if (current === 1) document.getElementById("prevBtn").disabled = true;
+        if (current === total)
+          document.getElementById("nextBtn").disabled = true;
+      });
+    </script>
+  </body>
+</html>

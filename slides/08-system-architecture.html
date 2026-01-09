@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>System Architecture Overview</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Noto Sans KR", sans-serif;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        background-color: #0f172a;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+      }
+      .slide-container {
+        width: 1280px;
+        height: 720px;
+        background-color: #0f172a;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        overflow: visible;
+      }
+
+      /* Background Elements */
+      .bg-pattern {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0.03;
+        z-index: 0;
+        background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      }
+      .decor-circle {
+        position: absolute;
+        border-radius: 50%;
+        z-index: 1;
+        filter: blur(80px);
+      }
+      .circle-1 {
+        width: 500px;
+        height: 500px;
+        background-color: #3b82f6;
+        opacity: 0.04;
+        top: -100px;
+        right: -100px;
+      }
+      .circle-2 {
+        width: 300px;
+        height: 300px;
+        background-color: #8b5cf6;
+        opacity: 0.04;
+        bottom: 50px;
+        left: -50px;
+      }
+
+      /* Header */
+      .header-section {
+        padding: 40px 80px 10px 80px;
+        z-index: 10;
+      }
+
+      .section-tag {
+        background-color: rgba(59, 130, 246, 0.1);
+        color: #60a5fa;
+        padding: 6px 12px;
+        border-radius: 4px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        display: inline-block;
+        margin-bottom: 15px;
+        border: 1px solid rgba(96, 165, 250, 0.2);
+      }
+
+      .main-title {
+        font-size: 2.5rem;
+        font-weight: 900;
+        color: #f8fafc;
+        margin: 0;
+        line-height: 1.2;
+      }
+
+      /* Diagram Canvas */
+      .diagram-wrapper {
+        flex: 1;
+        position: relative;
+        margin: 20px 60px 40px 60px;
+        z-index: 10;
+      }
+
+      .diagram-container {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      /* Connecting Lines Layer (SVG) */
+      .svg-layer {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+        pointer-events: none;
+      }
+
+      .connection-line {
+        stroke: #475569;
+        stroke-width: 2;
+        fill: none;
+        stroke-dasharray: 5, 5;
+        animation: flow 30s linear infinite;
+      }
+
+      .connection-line.solid {
+        stroke: #64748b;
+        stroke-dasharray: none;
+        stroke-width: 2;
+      }
+
+      @keyframes flow {
+        to {
+          stroke-dashoffset: -100;
+        }
+      }
+
+      /* Architecture Nodes */
+      .arch-node {
+        background-color: #1e293b;
+        border: 1px solid #475569;
+        border-radius: 8px;
+        padding: 10px 20px;
+        color: #f1f5f9;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        z-index: 2;
+        position: relative;
+      }
+
+      .arch-node i {
+        color: #60a5fa;
+      }
+
+      /* Tier 1: Client */
+      .client-tier {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 20px;
+      }
+      .node-client {
+        background-color: #0f172a;
+        border-color: #60a5fa;
+        width: 200px;
+        justify-content: center;
+      }
+
+      /* Tier 2: Ingress */
+      .ingress-tier {
+        display: flex;
+        justify-content: center;
+        gap: 40px;
+        margin-bottom: 30px;
+      }
+      .node-ingress {
+        background-color: #1e293b;
+        border-color: #94a3b8;
+      }
+
+      /* Tier 3: EKS Cluster */
+      .cluster-tier {
+        width: 100%;
+        background-color: rgba(30, 41, 59, 0.3);
+        border: 1px dashed #475569;
+        border-radius: 16px;
+        padding: 20px;
+        position: relative;
+        margin-bottom: 30px;
+      }
+
+      .cluster-label {
+        position: absolute;
+        top: -12px;
+        left: 20px;
+        background-color: #0f172a;
+        padding: 0 10px;
+        color: #94a3b8;
+        font-size: 0.9rem;
+        font-weight: 700;
+      }
+
+      .services-container {
+        display: flex;
+        justify-content: space-around;
+        gap: 15px;
+      }
+
+      .node-service {
+        background-color: #334155;
+        border-color: #60a5fa;
+        flex-direction: column;
+        padding: 15px;
+        min-width: 140px;
+        text-align: center;
+      }
+      .node-service i {
+        font-size: 1.5rem;
+        margin-bottom: 5px;
+      }
+      .service-port {
+        font-size: 0.75rem;
+        color: #94a3b8;
+        background-color: #1e293b;
+        padding: 2px 6px;
+        border-radius: 4px;
+        margin-top: 5px;
+      }
+
+      /* Tier 4: Event Bus */
+      .event-tier {
+        display: flex;
+        justify-content: center;
+        gap: 40px;
+        margin-bottom: 30px;
+      }
+      .node-event {
+        background-color: #4c1d95; /* Indigo 900 */
+        border-color: #8b5cf6;
+        min-width: 180px;
+        justify-content: center;
+      }
+      .node-event.sqs {
+        background-color: #be185d; /* Pink 800 */
+        border-color: #f472b6;
+      }
+
+      /* Tier 5: Data Layer */
+      .data-tier {
+        display: flex;
+        justify-content: center;
+        gap: 40px;
+      }
+      .node-data {
+        background-color: #1e293b;
+        border-color: #3b82f6;
+        min-width: 160px;
+        justify-content: center;
+        flex-direction: column;
+        gap: 5px;
+        padding: 15px;
+      }
+      .node-data i {
+        font-size: 1.5rem;
+      }
+      .data-sub {
+        font-size: 0.8rem;
+        color: #94a3b8;
+      }
+
+      .page-indicator {
+        position: absolute;
+        bottom: 80px;
+        right: 40px;
+        color: #475569;
+        font-size: 0.9rem;
+        font-weight: 500;
+      }
+
+      /* Navigation Bar - 오른쪽 하단에 조용하게 */
+      .nav-bar {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background-color: rgba(15, 23, 42, 0.6);
+        border: 1px solid rgba(148, 163, 184, 0.15);
+        border-radius: 12px;
+        padding: 8px 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        z-index: 1000;
+        backdrop-filter: blur(8px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        opacity: 0.7;
+        transition: opacity 0.3s ease;
+      }
+
+      .nav-bar:hover {
+        opacity: 1;
+      }
+
+      .nav-button {
+        background-color: transparent;
+        border: none;
+        color: #94a3b8;
+        padding: 6px 10px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.85rem;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-family: "Noto Sans KR", sans-serif;
+        min-width: auto;
+      }
+
+      .nav-button:hover:not(:disabled) {
+        background-color: rgba(59, 130, 246, 0.15);
+        color: #60a5fa;
+      }
+
+      .nav-button:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+      }
+
+      .nav-page-info {
+        color: #64748b;
+        font-size: 0.8rem;
+        font-weight: 500;
+        padding: 0 8px;
+        white-space: nowrap;
+      }
+
+      .nav-home-button {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="slide-container">
+      <!-- Background Elements -->
+      <div class="bg-pattern"></div>
+      <div class="decor-circle circle-1"></div>
+      <div class="decor-circle circle-2"></div>
+      <!-- Header -->
+      <div class="header-section">
+        <div class="section-tag">SYSTEM ARCHITECTURE</div>
+        <h1 class="main-title">시스템 아키텍처 개요</h1>
+      </div>
+      <!-- Diagram Wrapper -->
+      <div class="diagram-wrapper">
+        <div class="diagram-container">
+          <!-- SVG Lines Layer -->
+          <svg class="svg-layer">
+            <!-- Client to Ingress -->
+            <line
+              class="connection-line solid"
+              x1="50%"
+              x2="50%"
+              y1="60"
+              y2="100"
+            ></line>
+            <!-- Ingress to Cluster -->
+            <line
+              class="connection-line solid"
+              x1="50%"
+              x2="50%"
+              y1="150"
+              y2="200"
+            ></line>
+            <!-- Services to Events (Vertical lines from services to event bus area) -->
+            <line
+              class="connection-line"
+              x1="20%"
+              x2="40%"
+              y1="330"
+              y2="390"
+            ></line>
+            <!-- Account to SNS -->
+            <line
+              class="connection-line"
+              x1="35%"
+              x2="40%"
+              y1="330"
+              y2="390"
+            ></line>
+            <!-- Ticket to SNS -->
+            <line
+              class="connection-line"
+              x1="50%"
+              x2="40%"
+              y1="330"
+              y2="390"
+            ></line>
+            <!-- Trade to SNS -->
+            <!-- Events to SQS -->
+            <line
+              class="connection-line"
+              x1="45%"
+              x2="55%"
+              y1="420"
+              y2="420"
+            ></line>
+            <!-- SQS to Consumer Services (Back up) -->
+            <line
+              class="connection-line"
+              x1="60%"
+              x2="65%"
+              y1="390"
+              y2="330"
+            ></line>
+            <!-- SQS to Chat -->
+            <!-- Services to Data -->
+            <line
+              class="connection-line solid"
+              x1="20%"
+              x2="25%"
+              y1="330"
+              y2="520"
+            ></line>
+            <!-- Account to RDS -->
+            <line
+              class="connection-line solid"
+              x1="35%"
+              x2="50%"
+              y1="330"
+              y2="520"
+            ></line>
+            <!-- Ticket to Cache -->
+            <line
+              class="connection-line solid"
+              x1="80%"
+              x2="75%"
+              y1="330"
+              y2="520"
+            ></line>
+            <!-- CS to S3 -->
+          </svg>
+          <!-- Tier 1: Client -->
+          <div class="client-tier">
+            <div class="arch-node node-client">
+              <i class="fa-solid fa-laptop"></i>
+              <span>Web Client / Mobile</span>
+            </div>
+          </div>
+          <!-- Tier 2: Ingress -->
+          <div class="ingress-tier">
+            <div class="arch-node node-ingress">
+              <i class="fa-brands fa-aws"></i>
+              <span>CloudFront (CDN)</span>
+            </div>
+            <div class="arch-node node-ingress">
+              <i class="fa-solid fa-network-wired"></i>
+              <span>ALB (Load Balancer)</span>
+            </div>
+          </div>
+          <!-- Tier 3: EKS Cluster -->
+          <div class="cluster-tier">
+            <div class="cluster-label">EKS Cluster (Kubernetes)</div>
+            <div class="services-container">
+              <div class="arch-node node-service">
+                <i class="fa-solid fa-user-shield"></i>
+                <span>Account</span>
+                <span class="service-port">:8081</span>
+              </div>
+              <div class="arch-node node-service">
+                <i class="fa-solid fa-ticket"></i>
+                <span>Ticket</span>
+                <span class="service-port">:8082</span>
+              </div>
+              <div class="arch-node node-service">
+                <i class="fa-solid fa-handshake"></i>
+                <span>Trade</span>
+                <span class="service-port">:8083</span>
+              </div>
+              <div class="arch-node node-service">
+                <i class="fa-solid fa-comments"></i>
+                <span>Chat</span>
+                <span class="service-port">:8084</span>
+              </div>
+              <div class="arch-node node-service">
+                <i class="fa-solid fa-headset"></i>
+                <span>CS Service</span>
+                <span class="service-port">:8085</span>
+              </div>
+            </div>
+          </div>
+          <!-- Tier 4: Event Bus -->
+          <div class="event-tier">
+            <div class="arch-node node-event">
+              <i class="fa-solid fa-bullhorn"></i>
+              <span>SNS Topics</span>
+            </div>
+            <div class="arch-node node-event sqs">
+              <i class="fa-solid fa-inbox"></i>
+              <span>SQS Queues</span>
+            </div>
+          </div>
+          <!-- Tier 5: Data Layer -->
+          <div class="data-tier">
+            <div class="arch-node node-data">
+              <i class="fa-solid fa-database"></i>
+              <span>RDS Aurora</span>
+              <span class="data-sub">MySQL 8.0</span>
+            </div>
+            <div class="arch-node node-data">
+              <i class="fa-solid fa-memory"></i>
+              <span>ElastiCache</span>
+              <span class="data-sub">Redis / Valkey</span>
+            </div>
+            <div class="arch-node node-data">
+              <i class="fa-solid fa-hard-drive"></i>
+              <span>S3 Bucket</span>
+              <span class="data-sub">Object Storage</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Navigation Bar - 페이지 오른쪽 하단 -->
+    <div class="nav-bar">
+      <button
+        class="nav-button"
+        onclick="window.goToPreviousSlide()"
+        id="prevBtn"
+        title="이전 슬라이드"
+      >
+        <i class="fa-solid fa-chevron-left"></i>
+      </button>
+      <div class="nav-page-info">
+        <span id="currentPage">8</span> / <span id="totalPages">19</span>
+      </div>
+      <button
+        class="nav-button"
+        onclick="window.goToNextSlide()"
+        id="nextBtn"
+        title="다음 슬라이드"
+      >
+        <i class="fa-solid fa-chevron-right"></i>
+      </button>
+    </div>
+    <script src="../assets/js/navigation.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const current = window.getCurrentSlideNumber();
+        const total = window.getTotalSlides();
+        document.getElementById("currentPage").textContent = current;
+        document.getElementById("totalPages").textContent = total;
+        if (current === 1) document.getElementById("prevBtn").disabled = true;
+        if (current === total)
+          document.getElementById("nextBtn").disabled = true;
+      });
+    </script>
+  </body>
+</html>

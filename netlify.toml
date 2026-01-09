@@ -1,0 +1,9 @@
+[build]
+  publish = "."
+  command = ""
+
+# 정적 HTML 파일이므로 빌드 명령 불필요
+# 모든 파일이 이미 배포 가능한 상태
+
+[build.environment]
+  NODE_VERSION = "18"

@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Q&amp;A</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&amp;family=JetBrains+Mono:wght@400;700&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Noto Sans KR", sans-serif;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        background-color: #0f172a;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+      }
+      .slide-container {
+        width: 1280px;
+        height: 720px;
+        background-color: #0f172a;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+      }
+
+      /* Background Elements */
+      .bg-pattern {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0.03;
+        z-index: 0;
+        background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      }
+      .decor-circle {
+        position: absolute;
+        border-radius: 50%;
+        z-index: 1;
+        filter: blur(80px);
+      }
+      .circle-1 {
+        width: 600px;
+        height: 600px;
+        background-color: #1e3a8a; /* Blue 900 */
+        opacity: 0.2;
+        top: -150px;
+        right: -100px;
+      }
+      .circle-2 {
+        width: 500px;
+        height: 500px;
+        background-color: #4c1d95; /* Violet 900 */
+        opacity: 0.15;
+        bottom: -100px;
+        left: -100px;
+      }
+
+      /* Main Content */
+      .qa-content {
+        z-index: 10;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        width: 100%;
+      }
+
+      .icon-container {
+        margin-bottom: 30px;
+        position: relative;
+      }
+
+      .icon-circle {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background-color: rgba(59, 130, 246, 0.1);
+        border: 2px solid rgba(59, 130, 246, 0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 0 40px rgba(59, 130, 246, 0.15);
+      }
+
+      .icon-circle i {
+        font-size: 3rem;
+        color: #60a5fa;
+      }
+
+      .title-text {
+        font-size: 8rem;
+        font-weight: 900;
+        line-height: 1;
+        margin: 0;
+        color: #f8fafc;
+        letter-spacing: -0.02em;
+        text-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      }
+
+      .subtitle-text {
+        font-size: 2.2rem;
+        font-weight: 300;
+        color: #94a3b8;
+        margin: 20px 0 50px 0;
+        letter-spacing: 0.05em;
+      }
+
+      .divider {
+        width: 60px;
+        height: 4px;
+        background-color: #3b82f6;
+        margin-bottom: 60px;
+        border-radius: 2px;
+      }
+
+      /* Contact Info Cards */
+      .contact-grid {
+        display: flex;
+        gap: 30px;
+        justify-content: center;
+      }
+
+      .contact-card {
+        background-color: rgba(30, 41, 59, 0.4);
+        border: 1px solid rgba(148, 163, 184, 0.1);
+        border-radius: 12px;
+        padding: 20px 40px;
+        min-width: 240px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        backdrop-filter: blur(5px);
+        transition: transform 0.3s ease, background-color 0.3s ease;
+      }
+
+      .contact-card:hover {
+        transform: translateY(-5px);
+        background-color: rgba(30, 41, 59, 0.6);
+        border-color: rgba(59, 130, 246, 0.3);
+      }
+
+      .card-icon {
+        font-size: 1.5rem;
+        color: #818cf8;
+        margin-bottom: 12px;
+      }
+
+      .card-label {
+        font-size: 0.85rem;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        font-weight: 700;
+        margin: 0 0 4px 0;
+      }
+
+      .card-value {
+        font-size: 1.1rem;
+        color: #e2e8f0;
+        font-weight: 500;
+        margin: 0;
+      }
+
+      .footer {
+        position: absolute;
+        bottom: 30px;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        padding: 0 40px;
+        box-sizing: border-box;
+        color: #475569;
+        font-size: 0.9rem;
+        font-weight: 500;
+        z-index: 10;
+      }
+
+      .thanks-message {
+        position: absolute;
+        bottom: 100px;
+        font-size: 1.1rem;
+        color: #64748b;
+        font-weight: 400;
+      }
+
+      /* Navigation Bar - 오른쪽 하단에 조용하게 */
+      .nav-bar {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background-color: rgba(15, 23, 42, 0.6);
+        border: 1px solid rgba(148, 163, 184, 0.15);
+        border-radius: 12px;
+        padding: 8px 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        z-index: 1000;
+        backdrop-filter: blur(8px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        opacity: 0.7;
+        transition: opacity 0.3s ease;
+      }
+
+      .nav-bar:hover {
+        opacity: 1;
+      }
+
+      .nav-button {
+        background-color: transparent;
+        border: none;
+        color: #94a3b8;
+        padding: 6px 10px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.85rem;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-family: "Noto Sans KR", sans-serif;
+        min-width: auto;
+      }
+
+      .nav-button:hover:not(:disabled) {
+        background-color: rgba(59, 130, 246, 0.15);
+        color: #60a5fa;
+      }
+
+      .nav-button:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+      }
+
+      .nav-page-info {
+        color: #64748b;
+        font-size: 0.8rem;
+        font-weight: 500;
+        padding: 0 8px;
+        white-space: nowrap;
+      }
+
+      .nav-home-button {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="slide-container">
+      <!-- Background Elements -->
+      <div class="bg-pattern"></div>
+      <div class="decor-circle circle-1"></div>
+      <div class="decor-circle circle-2"></div>
+      <!-- Main Q&A Content -->
+      <div class="qa-content">
+        <div class="icon-container">
+          <div class="icon-circle">
+            <i class="fa-solid fa-comments"></i>
+          </div>
+        </div>
+        <h1 class="title-text">Q &amp; A</h1>
+        <p class="subtitle-text"></p>
+        <div class="divider"></div>
+        <div class="contact-grid">
+          <!-- Presenter Info -->
+          <div class="contact-card">
+            <i class="card-icon fa-solid fa-user-tie"></i>
+            <p class="card-label">Presenter</p>
+            <p class="card-value">내이름은코난탐정2조</p>
+          </div>
+        </div>
+      </div>
+      <!-- Footer -->
+      <div class="footer">
+        <div class="footer-left">Passit Project Presentation</div>
+      </div>
+    </div>
+    <!-- Navigation Bar - 페이지 오른쪽 하단 -->
+    <div class="nav-bar">
+      <button
+        class="nav-button"
+        onclick="window.goToPreviousSlide()"
+        id="prevBtn"
+        title="이전 슬라이드"
+      >
+        <i class="fa-solid fa-chevron-left"></i>
+      </button>
+      <div class="nav-page-info">
+        <span id="currentPage">19</span> / <span id="totalPages">19</span>
+      </div>
+      <button
+        class="nav-button"
+        onclick="window.goToNextSlide()"
+        id="nextBtn"
+        disabled
+        title="다음 슬라이드"
+      >
+        <i class="fa-solid fa-chevron-right"></i>
+      </button>
+    </div>
+    <script src="../assets/js/navigation.js"></script>
+    <script>
+      // 네비게이션 바 초기화
+      document.addEventListener("DOMContentLoaded", function () {
+        const current = window.getCurrentSlideNumber();
+        const total = window.getTotalSlides();
+
+        document.getElementById("currentPage").textContent = current;
+        document.getElementById("totalPages").textContent = total;
+
+        // 첫 번째/마지막 슬라이드에서 버튼 비활성화
+        if (current === 1) {
+          document.getElementById("prevBtn").disabled = true;
+        }
+        if (current === total) {
+          document.getElementById("nextBtn").disabled = true;
+        }
+      });
+    </script>
+  </body>
+</html>

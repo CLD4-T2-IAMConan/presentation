@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>AWS Infrastructure Configuration</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Noto Sans KR", sans-serif;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        background-color: #0f172a;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+      }
+      .slide-container {
+        width: 1280px;
+        height: 720px;
+        background-color: #0f172a;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        overflow: visible;
+      }
+
+      /* Background Elements */
+      .bg-pattern {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0.03;
+        z-index: 0;
+        background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      }
+      .decor-circle {
+        position: absolute;
+        border-radius: 50%;
+        z-index: 1;
+        filter: blur(80px);
+      }
+      .circle-1 {
+        width: 500px;
+        height: 500px;
+        background-color: #3b82f6;
+        opacity: 0.04;
+        top: -100px;
+        right: -100px;
+      }
+      .circle-2 {
+        width: 300px;
+        height: 300px;
+        background-color: #8b5cf6;
+        opacity: 0.04;
+        bottom: 50px;
+        left: -50px;
+      }
+
+      /* Header */
+      .header-section {
+        padding: 40px 80px 10px 80px;
+        z-index: 10;
+      }
+
+      .section-tag {
+        background-color: rgba(59, 130, 246, 0.1);
+        color: #60a5fa;
+        padding: 6px 12px;
+        border-radius: 4px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        display: inline-block;
+        margin-bottom: 15px;
+        border: 1px solid rgba(96, 165, 250, 0.2);
+      }
+
+      .main-title {
+        font-size: 2.5rem;
+        font-weight: 900;
+        color: #f8fafc;
+        margin: 0;
+        line-height: 1.2;
+      }
+
+      /* Diagram Layout */
+      .diagram-wrapper {
+        flex: 1;
+        position: relative;
+        margin: 20px 60px 40px 60px;
+        z-index: 10;
+        display: flex;
+        gap: 40px;
+      }
+
+      /* SVG Layer */
+      .svg-layer {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+        pointer-events: none;
+      }
+
+      .connection-line {
+        stroke: #475569;
+        stroke-width: 2;
+        fill: none;
+        stroke-dasharray: 5, 5;
+        animation: flow 30s linear infinite;
+      }
+
+      .connection-line.solid {
+        stroke: #64748b;
+        stroke-dasharray: none;
+        stroke-width: 2;
+      }
+
+      @keyframes flow {
+        to {
+          stroke-dashoffset: -100;
+        }
+      }
+
+      /* Nodes & Containers */
+      .vpc-container {
+        flex: 2;
+        border: 2px dashed #475569;
+        border-radius: 16px;
+        padding: 20px;
+        position: relative;
+        background-color: rgba(15, 23, 42, 0.5);
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      .vpc-label {
+        position: absolute;
+        top: -14px;
+        left: 20px;
+        background-color: #0f172a;
+        padding: 0 10px;
+        color: #f59e0b; /* Amber */
+        font-size: 1rem;
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .subnet-box {
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        border-radius: 8px;
+        padding: 10px 15px;
+        position: relative;
+      }
+
+      .subnet-public {
+        background: rgba(16, 185, 129, 0.05); /* Green tint */
+        border-color: rgba(16, 185, 129, 0.2);
+        height: 100px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 40px;
+      }
+
+      .subnet-private-app {
+        flex: 1;
+        background: rgba(59, 130, 246, 0.05); /* Blue tint */
+        border-color: rgba(59, 130, 246, 0.2);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .subnet-private-data {
+        background: rgba(99, 102, 241, 0.05); /* Indigo tint */
+        border-color: rgba(99, 102, 241, 0.2);
+        height: 100px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 40px;
+      }
+
+      .subnet-label {
+        position: absolute;
+        top: 5px;
+        left: 10px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+      }
+
+      .label-public {
+        color: #34d399;
+      }
+      .label-app {
+        color: #60a5fa;
+      }
+      .label-data {
+        color: #818cf8;
+      }
+
+      .arch-node {
+        background-color: #1e293b;
+        border: 1px solid #475569;
+        border-radius: 8px;
+        padding: 10px 15px;
+        color: #f1f5f9;
+        font-weight: 600;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        z-index: 2;
+        min-width: 140px;
+        justify-content: center;
+      }
+
+      .arch-node i {
+        font-size: 1.2rem;
+      }
+
+      .node-alb {
+        border-color: #34d399;
+      }
+      .node-eks {
+        border-color: #60a5fa;
+        background-color: #1e3a8a;
+        width: 300px;
+        height: 100px;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .node-db {
+        border-color: #818cf8;
+      }
+
+      .managed-services {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 20px 0;
+        position: relative;
+      }
+
+      .aws-service-group {
+        border: 1px solid rgba(71, 85, 105, 0.5);
+        background: rgba(30, 41, 59, 0.3);
+        border-radius: 12px;
+        padding: 15px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .group-label {
+        font-size: 0.8rem;
+        color: #94a3b8;
+        margin-bottom: 5px;
+        text-align: center;
+      }
+
+      .page-indicator {
+        position: absolute;
+        bottom: 30px;
+        right: 40px;
+        color: #475569;
+        font-size: 0.9rem;
+        font-weight: 500;
+      }
+
+      /* Navigation Bar - 오른쪽 하단에 조용하게 */
+      .nav-bar {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background-color: rgba(15, 23, 42, 0.6);
+        border: 1px solid rgba(148, 163, 184, 0.15);
+        border-radius: 12px;
+        padding: 8px 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        z-index: 1000;
+        backdrop-filter: blur(8px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        opacity: 0.7;
+        transition: opacity 0.3s ease;
+      }
+
+      .nav-bar:hover {
+        opacity: 1;
+      }
+
+      .nav-button {
+        background-color: transparent;
+        border: none;
+        color: #94a3b8;
+        padding: 6px 10px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.85rem;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-family: "Noto Sans KR", sans-serif;
+        min-width: auto;
+      }
+
+      .nav-button:hover:not(:disabled) {
+        background-color: rgba(59, 130, 246, 0.15);
+        color: #60a5fa;
+      }
+
+      .nav-button:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+      }
+
+      .nav-page-info {
+        color: #64748b;
+        font-size: 0.8rem;
+        font-weight: 500;
+        padding: 0 8px;
+        white-space: nowrap;
+      }
+
+      /* Node Colors */
+      .color-cf {
+        border-color: #f59e0b;
+      }
+      .color-s3 {
+        border-color: #10b981;
+      }
+      .color-sns {
+        border-color: #ec4899;
+      }
+      .color-mon {
+        border-color: #f97316;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="slide-container">
+      <!-- Background Elements -->
+      <div class="bg-pattern"></div>
+      <div class="decor-circle circle-1"></div>
+      <div class="decor-circle circle-2"></div>
+      <!-- Header -->
+      <div class="header-section">
+        <div class="section-tag">CLOUD INFRASTRUCTURE</div>
+        <h1 class="main-title">인프라 구성 (AWS)</h1>
+      </div>
+      <!-- Diagram Wrapper -->
+      <div class="diagram-wrapper">
+        <!-- SVG Connecting Lines -->
+        <svg class="svg-layer">
+          <!-- CloudFront to ALB -->
+          <path
+            class="connection-line solid"
+            d="M 860 80 L 300 80 L 300 130"
+            stroke="#f59e0b"
+          ></path>
+          <!-- ALB to EKS -->
+          <path class="connection-line solid" d="M 300 180 L 300 240"></path>
+          <!-- NAT to Internet (Visual only) -->
+          <path
+            class="connection-line"
+            d="M 500 130 L 500 80"
+            stroke-dasharray="2,2"
+          ></path>
+          <!-- EKS to RDS -->
+          <path class="connection-line solid" d="M 300 360 L 300 450"></path>
+          <!-- EKS to Cache -->
+          <path class="connection-line solid" d="M 350 360 L 500 450"></path>
+          <!-- EKS to External Services -->
+          <path
+            class="connection-line"
+            d="M 550 300 L 850 200"
+            stroke="#10b981"
+          ></path>
+          <!-- to S3 -->
+          <path
+            class="connection-line"
+            d="M 550 300 L 850 320"
+            stroke="#ec4899"
+          ></path>
+          <!-- to SNS -->
+          <path
+            class="connection-line"
+            d="M 550 300 L 850 440"
+            stroke="#f97316"
+          ></path>
+          <!-- to Monitor -->
+        </svg>
+        <!-- Left: VPC -->
+        <div class="vpc-container">
+          <div class="vpc-label">
+            <i class="fa-brands fa-aws"></i> AWS VPC (Virtual Private Cloud)
+          </div>
+          <!-- Public Subnet -->
+          <div class="subnet-box subnet-public">
+            <div class="subnet-label label-public">Public Subnet</div>
+            <div class="arch-node node-alb">
+              <i class="fa-solid fa-network-wired" style="color: #34d399"></i>
+              ALB (Ingress)
+            </div>
+            <div class="arch-node node-alb">
+              <i
+                class="fa-solid fa-arrow-up-from-bracket"
+                style="color: #34d399"
+              ></i>
+              NAT Gateway
+            </div>
+          </div>
+          <!-- Private Subnet (App) -->
+          <div class="subnet-box subnet-private-app">
+            <div class="subnet-label label-app">Private Subnet (App)</div>
+            <div class="arch-node node-eks">
+              <div
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: 10px;
+                  font-size: 1.1rem;
+                "
+              >
+                <i class="fa-solid fa-dharmachakra" style="color: #60a5fa"></i>
+                EKS Cluster
+              </div>
+              <div
+                style="
+                  display: flex;
+                  gap: 10px;
+                  font-size: 0.75rem;
+                  color: #93c5fd;
+                "
+              >
+                <span><i class="fa-solid fa-cubes"></i> Node Group</span>
+                <span><i class="fa-solid fa-arrows-left-right"></i> HPA</span>
+                <span><i class="fa-solid fa-layer-group"></i> Fargate</span>
+              </div>
+            </div>
+          </div>
+          <!-- Private Subnet (Data) -->
+          <div class="subnet-box subnet-private-data">
+            <div class="subnet-label label-data">Private Subnet (Data)</div>
+            <div class="arch-node node-db">
+              <i class="fa-solid fa-database" style="color: #818cf8"></i>
+              RDS Aurora (MySQL)
+            </div>
+            <div class="arch-node node-db">
+              <i class="fa-solid fa-memory" style="color: #818cf8"></i>
+              ElastiCache (Valkey)
+            </div>
+          </div>
+        </div>
+        <!-- Right: Managed Services -->
+        <div class="managed-services">
+          <div
+            class="aws-service-group"
+            style="border-color: rgba(245, 158, 11, 0.3)"
+          >
+            <div class="group-label">Content Delivery</div>
+            <div class="arch-node color-cf">
+              <i class="fa-brands fa-cloudflare" style="color: #f59e0b"></i>
+              CloudFront / Route53
+            </div>
+          </div>
+          <div
+            class="aws-service-group"
+            style="border-color: rgba(16, 185, 129, 0.3)"
+          >
+            <div class="group-label">Object Storage</div>
+            <div class="arch-node color-s3">
+              <i class="fa-solid fa-hard-drive" style="color: #10b981"></i> S3
+              Bucket
+            </div>
+          </div>
+          <div
+            class="aws-service-group"
+            style="border-color: rgba(236, 72, 153, 0.3)"
+          >
+            <div class="group-label">Messaging</div>
+            <div class="arch-node color-sns">
+              <i class="fa-solid fa-bullhorn" style="color: #ec4899"></i> SNS
+              Topics
+            </div>
+            <div class="arch-node color-sns">
+              <i class="fa-solid fa-inbox" style="color: #ec4899"></i> SQS
+              Queues
+            </div>
+          </div>
+          <div
+            class="aws-service-group"
+            style="border-color: rgba(249, 115, 22, 0.3)"
+          >
+            <div class="group-label">Monitoring</div>
+            <div class="arch-node color-mon">
+              <i class="fa-solid fa-chart-line" style="color: #f97316"></i>
+              CloudWatch
+            </div>
+            <div class="arch-node color-mon">
+              <i class="fa-solid fa-gauge-high" style="color: #f97316"></i>
+              Prometheus / Grafana
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Navigation Bar - 페이지 오른쪽 하단 -->
+    <div class="nav-bar">
+      <button
+        class="nav-button"
+        onclick="window.goToPreviousSlide()"
+        id="prevBtn"
+        title="이전 슬라이드"
+      >
+        <i class="fa-solid fa-chevron-left"></i>
+      </button>
+      <div class="nav-page-info">
+        <span id="currentPage">14</span> / <span id="totalPages">19</span>
+      </div>
+      <button
+        class="nav-button"
+        onclick="window.goToNextSlide()"
+        id="nextBtn"
+        title="다음 슬라이드"
+      >
+        <i class="fa-solid fa-chevron-right"></i>
+      </button>
+    </div>
+    <script src="../assets/js/navigation.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const current = window.getCurrentSlideNumber();
+        const total = window.getTotalSlides();
+        document.getElementById("currentPage").textContent = current;
+        document.getElementById("totalPages").textContent = total;
+        if (current === 1) document.getElementById("prevBtn").disabled = true;
+        if (current === total)
+          document.getElementById("nextBtn").disabled = true;
+      });
+    </script>
+  </body>
+</html>

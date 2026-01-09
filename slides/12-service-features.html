@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Passit Service Features</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Noto Sans KR", sans-serif;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        background-color: #0f172a;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+      }
+      .slide-container {
+        width: 1280px;
+        height: 720px;
+        background-color: #0f172a;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        overflow: visible;
+      }
+
+      /* Background Elements */
+      .bg-pattern {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0.03;
+        z-index: 0;
+        background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      }
+      .decor-circle {
+        position: absolute;
+        border-radius: 50%;
+        z-index: 1;
+        filter: blur(80px);
+      }
+      .circle-1 {
+        width: 500px;
+        height: 500px;
+        background-color: #3b82f6;
+        opacity: 0.04;
+        top: -100px;
+        right: -100px;
+      }
+      .circle-2 {
+        width: 300px;
+        height: 300px;
+        background-color: #8b5cf6;
+        opacity: 0.04;
+        bottom: 50px;
+        left: -50px;
+      }
+
+      /* Header */
+      .header-section {
+        padding: 40px 80px 10px 80px;
+        z-index: 10;
+      }
+
+      .section-tag {
+        background-color: rgba(16, 185, 129, 0.1);
+        color: #34d399;
+        padding: 6px 12px;
+        border-radius: 4px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        display: inline-block;
+        margin-bottom: 15px;
+        border: 1px solid rgba(52, 211, 153, 0.2);
+      }
+
+      .main-title {
+        font-size: 2.5rem;
+        font-weight: 900;
+        color: #f8fafc;
+        margin: 0;
+        line-height: 1.2;
+      }
+
+      /* Grid Layout */
+      .content-section {
+        flex: 1;
+        padding: 20px 80px 50px 80px;
+        z-index: 10;
+        display: flex;
+        align-items: center;
+      }
+
+      .grid-container {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        grid-template-rows: repeat(2, 1fr);
+        gap: 20px;
+        width: 100%;
+        height: 100%;
+      }
+
+      .feature-card {
+        background-color: rgba(30, 41, 59, 0.4);
+        border: 1px solid rgba(148, 163, 184, 0.1);
+        border-radius: 16px;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(5px);
+        overflow: hidden;
+      }
+
+      .feature-card:hover {
+        background-color: rgba(30, 41, 59, 0.7);
+        border-color: rgba(96, 165, 250, 0.4);
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+      }
+
+      /* Top Bar Accent */
+      .feature-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background-color: #3b82f6;
+        opacity: 0.7;
+      }
+
+      /* Color variations for accent bars */
+      .feature-card:nth-child(2)::before {
+        background-color: #8b5cf6;
+      } /* Violet */
+      .feature-card:nth-child(3)::before {
+        background-color: #10b981;
+      } /* Emerald */
+      .feature-card:nth-child(4)::before {
+        background-color: #f59e0b;
+      } /* Amber */
+      .feature-card:nth-child(5)::before {
+        background-color: #ec4899;
+      } /* Pink */
+      .feature-card:nth-child(6)::before {
+        background-color: #06b6d4;
+      } /* Cyan */
+
+      .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+      }
+
+      .icon-box {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        background-color: rgba(15, 23, 42, 0.5);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      /* Icon colors matching accents */
+      .feature-card:nth-child(1) .icon-box {
+        color: #60a5fa;
+      }
+      .feature-card:nth-child(2) .icon-box {
+        color: #a78bfa;
+      }
+      .feature-card:nth-child(3) .icon-box {
+        color: #34d399;
+      }
+      .feature-card:nth-child(4) .icon-box {
+        color: #fbbf24;
+      }
+      .feature-card:nth-child(5) .icon-box {
+        color: #f472b6;
+      }
+      .feature-card:nth-child(6) .icon-box {
+        color: #22d3ee;
+      }
+
+      .service-tag {
+        font-size: 0.75rem;
+        font-weight: 700;
+        padding: 2px 8px;
+        border-radius: 10px;
+        background-color: rgba(255, 255, 255, 0.1);
+        color: #cbd5e1;
+      }
+
+      .card-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #f1f5f9;
+        margin: 0 0 12px 0;
+        letter-spacing: -0.01em;
+      }
+
+      .feature-list {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        flex: 1;
+      }
+
+      .feature-list li {
+        position: relative;
+        padding-left: 20px;
+        margin-bottom: 6px;
+        font-size: 0.85rem;
+        color: #94a3b8;
+        line-height: 1.4;
+      }
+
+      .feature-list li::before {
+        content: "\f00c";
+        font-family: "Font Awesome 6 Free";
+        font-weight: 900;
+        position: absolute;
+        left: 0;
+        top: 2px;
+        font-size: 0.7rem;
+        color: #34d399;
+      }
+
+      .page-indicator {
+        position: absolute;
+        bottom: 30px;
+        right: 40px;
+        color: #475569;
+        font-size: 0.9rem;
+        font-weight: 500;
+      }
+
+      /* Navigation Bar - 오른쪽 하단에 조용하게 */
+      .nav-bar {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background-color: rgba(15, 23, 42, 0.6);
+        border: 1px solid rgba(148, 163, 184, 0.15);
+        border-radius: 12px;
+        padding: 8px 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        z-index: 1000;
+        backdrop-filter: blur(8px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        opacity: 0.7;
+        transition: opacity 0.3s ease;
+      }
+
+      .nav-bar:hover {
+        opacity: 1;
+      }
+
+      .nav-button {
+        background-color: transparent;
+        border: none;
+        color: #94a3b8;
+        padding: 6px 10px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.85rem;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-family: "Noto Sans KR", sans-serif;
+        min-width: auto;
+      }
+
+      .nav-button:hover:not(:disabled) {
+        background-color: rgba(59, 130, 246, 0.15);
+        color: #60a5fa;
+      }
+
+      .nav-button:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+      }
+
+      .nav-page-info {
+        color: #64748b;
+        font-size: 0.8rem;
+        font-weight: 500;
+        padding: 0 8px;
+        white-space: nowrap;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="slide-container">
+      <!-- Background Elements -->
+      <div class="bg-pattern"></div>
+      <div class="decor-circle circle-1"></div>
+      <div class="decor-circle circle-2"></div>
+      <!-- Header -->
+      <div class="header-section">
+        <div class="section-tag">SERVICE FEATURES</div>
+        <h1 class="main-title">주요 개발 기능 (서비스별)</h1>
+      </div>
+      <!-- Content Grid -->
+      <div class="content-section">
+        <div class="grid-container">
+          <!-- Card 1: Account Service -->
+          <div class="feature-card">
+            <div class="card-header">
+              <div class="icon-box">
+                <i class="fa-solid fa-user-shield"></i>
+              </div>
+              <span class="service-tag">Core</span>
+            </div>
+            <h3 class="card-title">Account Service</h3>
+            <ul class="feature-list">
+              <li><p>이메일 회원가입 및 카카오 OAuth2.0 소셜 로그인</p></li>
+              <li><p>JWT Access/Refresh Token 기반 인증 및 재발급</p></li>
+              <li><p>S3를 연동한 사용자 프로필 이미지 업로드</p></li>
+              <li><p>비밀번호 재설정 및 계정 상태(활성/정지) 관리</p></li>
+            </ul>
+          </div>
+          <!-- Card 2: Ticket Service -->
+          <div class="feature-card">
+            <div class="card-header">
+              <div class="icon-box">
+                <i class="fa-solid fa-ticket"></i>
+              </div>
+              <span class="service-tag">Product</span>
+            </div>
+            <h3 class="card-title">Ticket Service</h3>
+            <ul class="feature-list">
+              <li><p>공연/스포츠 티켓 등록, 수정, 삭제(CRUD)</p></li>
+              <li><p>다양한 조건(날짜, 카테고리)의 티켓 검색 필터링</p></li>
+              <li><p>티켓 실물 이미지 S3 업로드 및 URL 관리</p></li>
+              <li><p>판매 상태(판매중/예약중/판매완료) 관리 및 동기화</p></li>
+            </ul>
+          </div>
+          <!-- Card 3: Trade Service -->
+          <div class="feature-card">
+            <div class="card-header">
+              <div class="icon-box">
+                <i class="fa-solid fa-handshake"></i>
+              </div>
+              <span class="service-tag">Commerce</span>
+            </div>
+            <h3 class="card-title">Trade Service</h3>
+            <ul class="feature-list">
+              <li><p>안전 거래 생성 및 단계별 상태 자동 전환 관리</p></li>
+              <li><p>거래 요청 → 승인 → 결제 완료 → 거래 확정 프로세스</p></li>
+              <li><p>결제 정보 검증 및 거래 내역 영수증 처리</p></li>
+              <li><p>거래 상태 변경 시 SNS 이벤트 발행 (타 서비스 연동)</p></li>
+            </ul>
+          </div>
+          <!-- Card 4: Chat Service -->
+          <div class="feature-card">
+            <div class="card-header">
+              <div class="icon-box">
+                <i class="fa-solid fa-comments"></i>
+              </div>
+              <span class="service-tag">Real-time</span>
+            </div>
+            <h3 class="card-title">Chat Service</h3>
+            <ul class="feature-list">
+              <li><p>WebSocket &amp; STOMP 기반 실시간 1:1 채팅 구현</p></li>
+              <li><p>채팅방 생성 및 메시지 히스토리(MongoDB/Redis) 저장</p></li>
+              <li><p>거래 상태 변경 시 시스템 메시지 자동 발송</p></li>
+              <li><p>메시지 읽음/안읽음 처리 및 채팅방 리스트 갱신</p></li>
+            </ul>
+          </div>
+          <!-- Card 5: CS Service -->
+          <div class="feature-card">
+            <div class="card-header">
+              <div class="icon-box">
+                <i class="fa-solid fa-headset"></i>
+              </div>
+              <span class="service-tag">Support</span>
+            </div>
+            <h3 class="card-title">CS Service</h3>
+            <ul class="feature-list">
+              <li><p>사용자 1:1 문의 등록 및 티켓팅 시스템</p></li>
+              <li><p>관리자 답변 작성 및 답변 알림 처리</p></li>
+              <li><p>FAQ 관리 및 공지사항 게시판 운영</p></li>
+              <li><p>신고 접수 및 블랙리스트 사용자 관리</p></li>
+            </ul>
+          </div>
+          <!-- Card 6: Common / System -->
+          <div class="feature-card">
+            <div class="card-header">
+              <div class="icon-box">
+                <i class="fa-solid fa-network-wired"></i>
+              </div>
+              <span class="service-tag">Infra</span>
+            </div>
+            <h3 class="card-title">Common Features</h3>
+            <ul class="feature-list">
+              <li><p>AWS SNS/SQS 기반 이벤트 발행 및 구독 처리</p></li>
+              <li><p>Feign Client를 활용한 마이크로서비스 간 내부 통신</p></li>
+              <li><p>Global Exception Handler를 통한 통합 예외 처리</p></li>
+              <li><p>AOP 기반 로깅 및 Prometheus 메트릭 수집</p></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Navigation Bar - 페이지 오른쪽 하단 -->
+    <div class="nav-bar">
+      <button
+        class="nav-button"
+        onclick="window.goToPreviousSlide()"
+        id="prevBtn"
+        title="이전 슬라이드"
+      >
+        <i class="fa-solid fa-chevron-left"></i>
+      </button>
+      <div class="nav-page-info">
+        <span id="currentPage">12</span> / <span id="totalPages">19</span>
+      </div>
+      <button
+        class="nav-button"
+        onclick="window.goToNextSlide()"
+        id="nextBtn"
+        title="다음 슬라이드"
+      >
+        <i class="fa-solid fa-chevron-right"></i>
+      </button>
+    </div>
+    <script src="../assets/js/navigation.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const current = window.getCurrentSlideNumber();
+        const total = window.getTotalSlides();
+        document.getElementById("currentPage").textContent = current;
+        document.getElementById("totalPages").textContent = total;
+        if (current === 1) document.getElementById("prevBtn").disabled = true;
+        if (current === total)
+          document.getElementById("nextBtn").disabled = true;
+      });
+    </script>
+  </body>
+</html>

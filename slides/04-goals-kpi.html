@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Project Goals &amp; KPI</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Noto Sans KR", sans-serif;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        background-color: #0f172a;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+      }
+      .slide-container {
+        width: 1280px;
+        height: 720px;
+        background-color: #0f172a;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        overflow: visible;
+      }
+      .bg-pattern {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0.03;
+        z-index: 0;
+        background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      }
+      .decor-circle {
+        position: absolute;
+        border-radius: 50%;
+        z-index: 1;
+        filter: blur(80px);
+      }
+      .circle-1 {
+        width: 500px;
+        height: 500px;
+        background-color: #3b82f6;
+        opacity: 0.04;
+        top: -100px;
+        right: -100px;
+      }
+      .circle-2 {
+        width: 300px;
+        height: 300px;
+        background-color: #8b5cf6;
+        opacity: 0.04;
+        bottom: 50px;
+        left: -50px;
+      }
+
+      /* Header */
+      .header-section {
+        padding: 50px 80px 20px 80px;
+        z-index: 10;
+      }
+
+      .section-tag {
+        background-color: rgba(139, 92, 246, 0.1);
+        color: #a78bfa;
+        padding: 6px 12px;
+        border-radius: 4px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        display: inline-block;
+        margin-bottom: 15px;
+        border: 1px solid rgba(167, 139, 250, 0.2);
+      }
+
+      .main-title {
+        font-size: 2.8rem;
+        font-weight: 900;
+        color: #f8fafc;
+        margin: 0;
+        line-height: 1.2;
+      }
+
+      /* Content Layout */
+      .content-section {
+        flex: 1;
+        padding: 20px 80px 60px 80px;
+        z-index: 10;
+        display: flex;
+        gap: 60px;
+      }
+
+      .column {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .col-header {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #e2e8f0;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid rgba(148, 163, 184, 0.1);
+      }
+
+      .col-header i {
+        color: #60a5fa;
+      }
+
+      /* Goal Cards (Left) */
+      .goal-list {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .goal-card {
+        background-color: rgba(30, 41, 59, 0.4);
+        border: 1px solid rgba(148, 163, 184, 0.1);
+        border-radius: 12px;
+        padding: 20px;
+        display: flex;
+        align-items: flex-start;
+        gap: 16px;
+        transition: all 0.3s ease;
+      }
+
+      .goal-card:hover {
+        background-color: rgba(30, 41, 59, 0.7);
+        border-color: rgba(96, 165, 250, 0.3);
+        transform: translateX(5px);
+      }
+
+      .goal-icon {
+        width: 40px;
+        height: 40px;
+        background-color: rgba(59, 130, 246, 0.1);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #60a5fa;
+        flex-shrink: 0;
+        font-size: 1.1rem;
+      }
+
+      .goal-content h3 {
+        margin: 0 0 4px 0;
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #f1f5f9;
+      }
+
+      .goal-content p {
+        margin: 0;
+        font-size: 0.95rem;
+        color: #94a3b8;
+        line-height: 1.4;
+      }
+
+      /* KPI Cards (Right) */
+      .kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+      }
+
+      .kpi-card {
+        background-color: rgba(15, 23, 42, 0.6);
+        border: 1px solid rgba(139, 92, 246, 0.2);
+        border-radius: 16px;
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        overflow: hidden;
+      }
+
+      /* Remove pseudo-element gradient and use background color with opacity instead */
+      .kpi-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background-color: #8b5cf6; /* Solid color instead of gradient */
+      }
+
+      .kpi-card.highlight {
+        grid-column: span 2;
+        background-color: rgba(139, 92, 246, 0.1);
+        border-color: rgba(139, 92, 246, 0.4);
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .kpi-value {
+        font-size: 2.5rem;
+        font-weight: 900;
+        color: #f8fafc;
+        margin-bottom: 5px;
+        font-feature-settings: "tnum";
+        font-variant-numeric: tabular-nums;
+        letter-spacing: -0.02em;
+      }
+
+      .kpi-card.highlight .kpi-value {
+        font-size: 3.5rem;
+        color: #a78bfa;
+        margin-bottom: 0;
+      }
+
+      .kpi-label {
+        font-size: 0.95rem;
+        color: #cbd5e1;
+        font-weight: 500;
+      }
+
+      .kpi-sub {
+        font-size: 0.8rem;
+        color: #64748b;
+        margin-top: 8px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+
+      .kpi-icon {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        font-size: 1.5rem;
+        color: rgba(139, 92, 246, 0.3);
+      }
+
+      .page-indicator {
+        position: absolute;
+        bottom: 80px;
+        right: 40px;
+        color: #475569;
+        font-size: 0.9rem;
+        font-weight: 500;
+      }
+
+      /* Navigation Bar - 오른쪽 하단에 조용하게 */
+      .nav-bar {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background-color: rgba(15, 23, 42, 0.6);
+        border: 1px solid rgba(148, 163, 184, 0.15);
+        border-radius: 12px;
+        padding: 8px 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        z-index: 1000;
+        backdrop-filter: blur(8px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        opacity: 0.7;
+        transition: opacity 0.3s ease;
+      }
+
+      .nav-bar:hover {
+        opacity: 1;
+      }
+
+      .nav-button {
+        background-color: transparent;
+        border: none;
+        color: #94a3b8;
+        padding: 6px 10px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.85rem;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-family: "Noto Sans KR", sans-serif;
+        min-width: auto;
+      }
+
+      .nav-button:hover:not(:disabled) {
+        background-color: rgba(59, 130, 246, 0.15);
+        color: #60a5fa;
+      }
+
+      .nav-button:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+      }
+
+      .nav-page-info {
+        color: #64748b;
+        font-size: 0.8rem;
+        font-weight: 500;
+        padding: 0 8px;
+        white-space: nowrap;
+      }
+
+      .nav-home-button {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="slide-container">
+      <!-- Background Elements -->
+      <div class="bg-pattern"></div>
+      <div class="decor-circle circle-1"></div>
+      <div class="decor-circle circle-2"></div>
+      <!-- Header -->
+      <div class="header-section">
+        <div class="section-tag">GOALS &amp; METRICS</div>
+        <h1 class="main-title">프로젝트 목표 및 성공 지표</h1>
+      </div>
+      <!-- Main Content -->
+      <div class="content-section">
+        <!-- Left Column: Goals -->
+        <div class="column">
+          <div class="col-header">
+            <i class="fa-solid fa-bullseye"></i>
+            <span>Project Goals</span>
+          </div>
+          <div class="goal-list">
+            <div class="goal-card">
+              <div class="goal-icon">
+                <i class="fa-solid fa-shield-halved"></i>
+              </div>
+              <div class="goal-content">
+                <h3>안전한 티켓 거래 환경</h3>
+                <p>
+                  사기 거래 방지 및 정가 기반의 투명한 티켓 유통 문화를
+                  조성합니다.
+                </p>
+              </div>
+            </div>
+            <div class="goal-card">
+              <div class="goal-icon">
+                <i class="fa-solid fa-bolt"></i>
+              </div>
+              <div class="goal-content">
+                <h3>실시간 중개 서비스</h3>
+                <p>
+                  WebSocket 기반의 실시간 채팅과 알림으로 즉각적인 거래 경험을
+                  제공합니다.
+                </p>
+              </div>
+            </div>
+            <div class="goal-card">
+              <div class="goal-icon">
+                <i class="fa-solid fa-server"></i>
+              </div>
+              <div class="goal-content">
+                <h3>고가용성 아키텍처</h3>
+                <p>
+                  트래픽 폭주 시에도 안정적인 서비스 유지를 위한 확장성 있는
+                  인프라를 구축합니다.
+                </p>
+              </div>
+            </div>
+            <div class="goal-card">
+              <div class="goal-icon">
+                <i class="fa-solid fa-cubes"></i>
+              </div>
+              <div class="goal-content">
+                <h3>MSA 기반 분산 시스템</h3>
+                <p>
+                  서비스 간 결합도를 낮추고 독립적인 배포가 가능한 유연한 구조를
+                  설계합니다.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Right Column: KPIs -->
+        <div class="column">
+          <div class="col-header" style="border-color: rgba(139, 92, 246, 0.2)">
+            <i class="fa-solid fa-chart-line" style="color: #a78bfa"></i>
+            <span>Key Performance Indicators</span>
+          </div>
+          <div class="kpi-grid">
+            <!-- Highlight KPI -->
+            <div class="kpi-card highlight">
+              <div>
+                <div class="kpi-label" style="color: #ddd6fe">
+                  Service Availability
+                </div>
+                <div class="kpi-sub" style="color: #8b5cf6">
+                  <i class="fa-solid fa-circle-check"></i> Target Achieved
+                </div>
+              </div>
+              <div class="kpi-value">99.9%</div>
+            </div>
+            <!-- Sub KPI 1 -->
+            <div class="kpi-card">
+              <i class="fa-solid fa-stopwatch kpi-icon"></i>
+              <div class="kpi-value">
+                50<span style="font-size: 1.5rem">ms</span>
+              </div>
+              <div class="kpi-label">Avg. API Latency</div>
+              <div class="kpi-sub">응답 속도 개선</div>
+            </div>
+            <!-- Sub KPI 2 -->
+            <div class="kpi-card">
+              <i class="fa-solid fa-comments kpi-icon"></i>
+              <div class="kpi-value">
+                &lt; 100<span style="font-size: 1.5rem">ms</span>
+              </div>
+              <div class="kpi-label">Chat Delivery</div>
+              <div class="kpi-sub">실시간 메시지 전송</div>
+            </div>
+            <!-- Sub KPI 3 -->
+            <div class="kpi-card">
+              <i class="fa-solid fa-rotate kpi-icon"></i>
+              <div class="kpi-value">
+                &lt; 1<span style="font-size: 1.5rem">min</span>
+              </div>
+              <div class="kpi-label">RTO (Recovery)</div>
+              <div class="kpi-sub">장애 자동 복구 시간</div>
+            </div>
+            <!-- Sub KPI 4 -->
+            <div class="kpi-card">
+              <i class="fa-solid fa-rocket kpi-icon"></i>
+              <div class="kpi-value">Zero</div>
+              <div class="kpi-label">Downtime Deploy</div>
+              <div class="kpi-sub">무중단 배포 구현</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Navigation Bar - 페이지 오른쪽 하단 -->
+    <div class="nav-bar">
+      <button
+        class="nav-button"
+        onclick="window.goToPreviousSlide()"
+        id="prevBtn"
+        title="이전 슬라이드"
+      >
+        <i class="fa-solid fa-chevron-left"></i>
+      </button>
+      <div class="nav-page-info">
+        <span id="currentPage">4</span> / <span id="totalPages">19</span>
+      </div>
+      <button
+        class="nav-button"
+        onclick="window.goToNextSlide()"
+        id="nextBtn"
+        title="다음 슬라이드"
+      >
+        <i class="fa-solid fa-chevron-right"></i>
+      </button>
+    </div>
+    <script src="../assets/js/navigation.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const current = window.getCurrentSlideNumber();
+        const total = window.getTotalSlides();
+        document.getElementById("currentPage").textContent = current;
+        document.getElementById("totalPages").textContent = total;
+        if (current === 1) document.getElementById("prevBtn").disabled = true;
+        if (current === total)
+          document.getElementById("nextBtn").disabled = true;
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Event-Driven Architecture</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Noto Sans KR", sans-serif;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        background-color: #0f172a;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+      }
+      .slide-container {
+        width: 1360px;
+        height: 720px;
+        background-color: #0f172a;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        overflow: visible;
+      }
+
+      /* Background Elements */
+      .bg-pattern {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0.03;
+        z-index: 0;
+        background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      }
+      .decor-circle {
+        position: absolute;
+        border-radius: 50%;
+        z-index: 1;
+        filter: blur(80px);
+      }
+      .circle-1 {
+        width: 500px;
+        height: 500px;
+        background-color: #7c3aed; /* Violet */
+        opacity: 0.05;
+        top: -150px;
+        right: -100px;
+      }
+      .circle-2 {
+        width: 400px;
+        height: 400px;
+        background-color: #db2777; /* Pink */
+        opacity: 0.05;
+        bottom: -50px;
+        left: -100px;
+      }
+
+      /* Header */
+      .header-section {
+        padding: 40px 80px 20px 80px;
+        z-index: 10;
+      }
+
+      .section-tag {
+        background-color: rgba(139, 92, 246, 0.1);
+        color: #a78bfa;
+        padding: 6px 12px;
+        border-radius: 4px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        display: inline-block;
+        margin-bottom: 15px;
+        border: 1px solid rgba(167, 139, 250, 0.2);
+      }
+
+      .main-title {
+        font-size: 2.5rem;
+        font-weight: 900;
+        color: #f8fafc;
+        margin: 0;
+        line-height: 1.2;
+      }
+
+      /* Diagram Canvas */
+      .diagram-wrapper {
+        flex: 1;
+        position: relative;
+        margin: 20px 80px 60px 80px;
+        z-index: 10;
+      }
+
+      .diagram-container {
+        width: 100%;
+        height: 100%;
+        position: relative;
+      }
+
+      /* SVG Layer */
+      .svg-layer {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+        pointer-events: none;
+      }
+
+      .connection-line {
+        stroke: #475569;
+        stroke-width: 2;
+        fill: none;
+        stroke-dasharray: 5, 5;
+        animation: flow 20s linear infinite;
+      }
+
+      @keyframes flow {
+        to {
+          stroke-dashoffset: -100;
+        }
+      }
+
+      /* Nodes */
+      .arch-node {
+        position: absolute;
+        background-color: #1e293b;
+        border: 2px solid;
+        border-radius: 12px;
+        padding: 12px 20px;
+        color: #f1f5f9;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+        z-index: 2;
+        transform: translate(-50%, -50%);
+        white-space: nowrap;
+      }
+
+      .node-publisher {
+        border-color: #3b82f6; /* Blue */
+        background: linear-gradient(145deg, #1e293b, #0f172a);
+      }
+      .node-publisher i {
+        color: #60a5fa;
+      }
+
+      .node-sns {
+        border-color: #8b5cf6; /* Violet */
+        background-color: #4c1d95;
+        color: #ede9fe;
+      }
+      .node-sns i {
+        color: #ddd6fe;
+      }
+
+      .node-sqs {
+        border-color: #ec4899; /* Pink */
+        background-color: #831843;
+        color: #fce7f3;
+      }
+      .node-sqs i {
+        color: #fbcfe8;
+      }
+
+      .node-consumer {
+        border-color: #10b981; /* Emerald */
+        background: linear-gradient(145deg, #1e293b, #0f172a);
+      }
+      .node-consumer i {
+        color: #34d399;
+      }
+
+      .label-text {
+        position: absolute;
+        color: #94a3b8;
+        font-size: 0.8rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .section-box {
+        position: absolute;
+        border: 1px dashed #334155;
+        border-radius: 16px;
+        background-color: rgba(30, 41, 59, 0.3);
+        z-index: 1;
+      }
+
+      .section-title {
+        position: absolute;
+        top: -12px;
+        left: 20px;
+        background-color: #0f172a;
+        padding: 0 10px;
+        color: #94a3b8;
+        font-size: 0.9rem;
+        font-weight: 700;
+      }
+
+      .event-badge {
+        position: absolute;
+        background-color: #1e1b4b;
+        border: 1px solid #4338ca;
+        color: #a5b4fc;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.7rem;
+        z-index: 5;
+        transform: translate(-50%, -50%);
+      }
+
+      .page-indicator {
+        position: absolute;
+        bottom: 80px;
+        right: 40px;
+        color: #475569;
+        font-size: 0.9rem;
+        font-weight: 500;
+      }
+
+      /* Navigation Bar - 오른쪽 하단에 조용하게 */
+      .nav-bar {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background-color: rgba(15, 23, 42, 0.6);
+        border: 1px solid rgba(148, 163, 184, 0.15);
+        border-radius: 12px;
+        padding: 8px 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        z-index: 1000;
+        backdrop-filter: blur(8px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        opacity: 0.7;
+        transition: opacity 0.3s ease;
+      }
+
+      .nav-bar:hover {
+        opacity: 1;
+      }
+
+      .nav-button {
+        background-color: transparent;
+        border: none;
+        color: #94a3b8;
+        padding: 6px 10px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.85rem;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-family: "Noto Sans KR", sans-serif;
+        min-width: auto;
+      }
+
+      .nav-button:hover:not(:disabled) {
+        background-color: rgba(59, 130, 246, 0.15);
+        color: #60a5fa;
+      }
+
+      .nav-button:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+      }
+
+      .nav-page-info {
+        color: #64748b;
+        font-size: 0.8rem;
+        font-weight: 500;
+        padding: 0 8px;
+        white-space: nowrap;
+      }
+
+      .nav-home-button {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="slide-container">
+      <!-- Background Elements -->
+      <div class="bg-pattern"></div>
+      <div class="decor-circle circle-1"></div>
+      <div class="decor-circle circle-2"></div>
+      <!-- Header -->
+      <div class="header-section">
+        <div class="section-tag">EVENT-DRIVEN ARCHITECTURE</div>
+        <h1 class="main-title">이벤트 기반 아키텍처 흐름</h1>
+      </div>
+      <!-- Diagram Wrapper -->
+      <div class="diagram-wrapper">
+        <div class="diagram-container">
+          <!-- Section Box: Abstract Pattern -->
+          <div
+            class="section-box"
+            style="top: 0; left: 0; width: 100%; height: 160px"
+          >
+            <div class="section-title">Pub/Sub Pattern Overview</div>
+          </div>
+          <!-- Section Box: Scenario -->
+          <div
+            class="section-box"
+            style="top: 200px; left: 0; width: 100%; height: 320px"
+          >
+            <div class="section-title">
+              Real-world Scenario: Deal Creation Flow
+            </div>
+          </div>
+          <!-- SVG Lines Layer -->
+          <svg class="svg-layer">
+            <!-- Pattern Lines -->
+            <path class="connection-line" d="M 220 80 L 480 80"></path>
+            <!-- Pub -> SNS -->
+            <path
+              class="connection-line"
+              d="M 620 80 C 650 80, 650 50, 680 50 L 780 50"
+            ></path>
+            <!-- SNS -> SQS1 -->
+            <path
+              class="connection-line"
+              d="M 620 80 C 650 80, 650 110, 680 110 L 780 110"
+            ></path>
+            <!-- SNS -> SQS2 -->
+            <path class="connection-line" d="M 900 50 L 1000 50"></path>
+            <!-- SQS1 -> Con1 -->
+            <path class="connection-line" d="M 900 110 L 1000 110"></path>
+            <!-- SQS2 -> Con2 -->
+            <!-- Scenario Lines -->
+            <path class="connection-line" d="M 220 360 L 480 360"></path>
+            <!-- Trade -> SNS -->
+            <path
+              class="connection-line"
+              d="M 620 360 C 660 360, 660 280, 700 280 L 780 280"
+            ></path>
+            <!-- SNS -> Chat Q -->
+            <path
+              class="connection-line"
+              d="M 620 360 C 660 360, 660 440, 700 440 L 780 440"
+            ></path>
+            <!-- SNS -> Ticket Q -->
+            <path class="connection-line" d="M 900 280 L 1000 280"></path>
+            <!-- Chat Q -> Chat Svc -->
+            <path class="connection-line" d="M 900 440 L 1000 440"></path>
+            <!-- Ticket Q -> Ticket Svc -->
+          </svg>
+          <!-- Tier 1: Pattern Nodes -->
+          <div class="arch-node node-publisher" style="left: 150px; top: 80px">
+            <i class="fa-solid fa-cube"></i>
+            <span>Publisher</span>
+          </div>
+          <div class="arch-node node-sns" style="left: 550px; top: 80px">
+            <i class="fa-solid fa-bullhorn"></i>
+            <span>SNS Topic</span>
+          </div>
+          <div class="arch-node node-sqs" style="left: 840px; top: 50px">
+            <i class="fa-solid fa-inbox"></i>
+            <span>Queue A</span>
+          </div>
+          <div class="arch-node node-sqs" style="left: 840px; top: 110px">
+            <i class="fa-solid fa-inbox"></i>
+            <span>Queue B</span>
+          </div>
+          <div class="arch-node node-consumer" style="left: 1080px; top: 50px">
+            <i class="fa-solid fa-microchip"></i>
+            <span>Service A</span>
+          </div>
+          <div class="arch-node node-consumer" style="left: 1080px; top: 110px">
+            <i class="fa-solid fa-microchip"></i>
+            <span>Service B</span>
+          </div>
+          <!-- Tier 2: Scenario Nodes -->
+          <!-- Publisher -->
+          <div class="arch-node node-publisher" style="left: 150px; top: 360px">
+            <i class="fa-solid fa-handshake"></i>
+            <span>Trade Service</span>
+          </div>
+          <!-- Event Badge -->
+          <div class="event-badge" style="left: 350px; top: 340px">
+            DealCreated
+          </div>
+          <!-- SNS -->
+          <div class="arch-node node-sns" style="left: 550px; top: 360px">
+            <i class="fa-solid fa-bullhorn"></i>
+            <span>deal-events</span>
+          </div>
+          <!-- SQS 1 -->
+          <div class="arch-node node-sqs" style="left: 840px; top: 280px">
+            <i class="fa-solid fa-inbox"></i>
+            <span>chat-deal-q</span>
+          </div>
+          <!-- SQS 2 -->
+          <div class="arch-node node-sqs" style="left: 840px; top: 440px">
+            <i class="fa-solid fa-inbox"></i>
+            <span>ticket-deal-q</span>
+          </div>
+          <!-- Consumers -->
+          <div class="arch-node node-consumer" style="left: 1080px; top: 280px">
+            <i class="fa-solid fa-comments"></i>
+            <span>Chat Service</span>
+          </div>
+          <div
+            class="label-text"
+            style="left: 1080px; top: 320px; transform: translateX(-50%)"
+          >
+            <p>Create Chat Room</p>
+          </div>
+          <div class="arch-node node-consumer" style="left: 1080px; top: 440px">
+            <i class="fa-solid fa-ticket"></i>
+            <span>Ticket Service</span>
+          </div>
+          <div
+            class="label-text"
+            style="left: 1080px; top: 480px; transform: translateX(-50%)"
+          >
+            <p>Update Status</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Navigation Bar - 페이지 오른쪽 하단 -->
+    <div class="nav-bar">
+      <button
+        class="nav-button"
+        onclick="window.goToPreviousSlide()"
+        id="prevBtn"
+        title="이전 슬라이드"
+      >
+        <i class="fa-solid fa-chevron-left"></i>
+      </button>
+      <div class="nav-page-info">
+        <span id="currentPage">10</span> / <span id="totalPages">19</span>
+      </div>
+      <button
+        class="nav-button"
+        onclick="window.goToNextSlide()"
+        id="nextBtn"
+        title="다음 슬라이드"
+      >
+        <i class="fa-solid fa-chevron-right"></i>
+      </button>
+    </div>
+    <script src="../assets/js/navigation.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const current = window.getCurrentSlideNumber();
+        const total = window.getTotalSlides();
+        document.getElementById("currentPage").textContent = current;
+        document.getElementById("totalPages").textContent = total;
+        if (current === 1) document.getElementById("prevBtn").disabled = true;
+        if (current === total)
+          document.getElementById("nextBtn").disabled = true;
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Passit Agenda</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Noto Sans KR", sans-serif;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        background-color: #0f172a;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+      }
+      .slide-container {
+        width: 1280px;
+        height: 720px;
+        background-color: #0f172a;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        overflow: visible;
+      }
+      .bg-pattern {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0.03;
+        z-index: 0;
+        background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      }
+      .decor-circle {
+        position: absolute;
+        border-radius: 50%;
+        z-index: 1;
+        filter: blur(80px);
+      }
+      .circle-1 {
+        width: 500px;
+        height: 500px;
+        background-color: #3b82f6;
+        opacity: 0.04;
+        top: -100px;
+        right: -100px;
+      }
+      .circle-2 {
+        width: 400px;
+        height: 400px;
+        background-color: #8b5cf6;
+        opacity: 0.04;
+        bottom: -50px;
+        left: -50px;
+      }
+
+      .header-section {
+        padding: 50px 80px 20px 80px;
+        z-index: 10;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+        margin-bottom: 40px;
+      }
+
+      .title-group h1 {
+        font-size: 3.5rem;
+        font-weight: 900;
+        color: #f8fafc;
+        margin: 0;
+        line-height: 1;
+        letter-spacing: -0.02em;
+      }
+
+      .title-group h1 span {
+        color: #60a5fa;
+      }
+
+      .title-group p {
+        font-size: 1.2rem;
+        color: #94a3b8;
+        margin: 10px 0 0 5px;
+        font-weight: 400;
+      }
+
+      .content-section {
+        flex: 1;
+        padding: 0 80px 60px 80px;
+        z-index: 10;
+        display: flex;
+        gap: 40px;
+      }
+
+      .column {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .agenda-item {
+        display: flex;
+        align-items: center;
+        background-color: rgba(30, 41, 59, 0.4);
+        border: 1px solid rgba(59, 130, 246, 0.1);
+        border-radius: 16px;
+        padding: 20px 25px;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      /* 
+           Using a subtle pseudo-element for hover effect simulation 
+           since we can't use complex animations
+        */
+      .agenda-item::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 4px;
+        height: 100%;
+        background-color: #3b82f6;
+        opacity: 0.5;
+      }
+
+      .agenda-item:nth-child(even)::before {
+        background-color: #8b5cf6;
+      }
+
+      .item-number {
+        font-size: 1.8rem;
+        font-weight: 900;
+        color: rgba(148, 163, 184, 0.2);
+        margin-right: 20px;
+        font-family: "Noto Sans KR", sans-serif;
+        min-width: 50px;
+      }
+
+      .item-icon {
+        width: 48px;
+        height: 48px;
+        background-color: rgba(15, 23, 42, 0.6);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 20px;
+        color: #60a5fa;
+        font-size: 1.2rem;
+        border: 1px solid rgba(96, 165, 250, 0.2);
+      }
+
+      .agenda-item:nth-child(even) .item-icon {
+        color: #a78bfa;
+        border-color: rgba(167, 139, 250, 0.2);
+      }
+
+      .item-text {
+        flex: 1;
+      }
+
+      .item-text h3 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #e2e8f0;
+        margin: 0;
+        letter-spacing: -0.01em;
+      }
+
+      .item-text p {
+        font-size: 0.9rem;
+        color: #94a3b8;
+        margin: 4px 0 0 0;
+      }
+
+      .page-indicator {
+        position: absolute;
+        bottom: 80px;
+        right: 40px;
+        color: #475569;
+        font-size: 0.9rem;
+        font-weight: 500;
+      }
+
+      /* Navigation Bar - 오른쪽 하단에 조용하게 */
+      .nav-bar {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background-color: rgba(15, 23, 42, 0.6);
+        border: 1px solid rgba(148, 163, 184, 0.15);
+        border-radius: 12px;
+        padding: 8px 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        z-index: 1000;
+        backdrop-filter: blur(8px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        opacity: 0.7;
+        transition: opacity 0.3s ease;
+      }
+
+      .nav-bar:hover {
+        opacity: 1;
+      }
+
+      .nav-button {
+        background-color: transparent;
+        border: none;
+        color: #94a3b8;
+        padding: 6px 10px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.85rem;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-family: "Noto Sans KR", sans-serif;
+        min-width: auto;
+      }
+
+      .nav-button:hover:not(:disabled) {
+        background-color: rgba(59, 130, 246, 0.15);
+        color: #60a5fa;
+      }
+
+      .nav-button:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+      }
+
+      .nav-page-info {
+        color: #64748b;
+        font-size: 0.8rem;
+        font-weight: 500;
+        padding: 0 8px;
+        white-space: nowrap;
+      }
+
+      .nav-home-button {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="slide-container">
+      <!-- Background Elements -->
+      <div class="bg-pattern"></div>
+      <div class="decor-circle circle-1"></div>
+      <div class="decor-circle circle-2"></div>
+      <!-- Header -->
+      <div class="header-section">
+        <div class="title-group">
+          <h1>Agenda</h1>
+          <p>Passit 프로젝트 발표 순서</p>
+        </div>
+        <div style="color: #64748b; font-size: 2rem">
+          <i class="fa-solid fa-list-ul"></i>
+        </div>
+      </div>
+      <!-- Content Grid -->
+      <div class="content-section">
+        <!-- Left Column -->
+        <div class="column">
+          <div class="agenda-item">
+            <span class="item-number">01</span>
+            <div class="item-icon">
+              <i class="fa-solid fa-flag"></i>
+            </div>
+            <div class="item-text">
+              <h3>프로젝트 개요</h3>
+              <p>목표 및 주요 특징</p>
+            </div>
+          </div>
+          <div class="agenda-item">
+            <span class="item-number">02</span>
+            <div class="item-icon">
+              <i class="fa-solid fa-list-check"></i>
+            </div>
+            <div class="item-text">
+              <h3>비즈니스 요구사항</h3>
+              <p>핵심 기능 및 비기능 요구사항</p>
+            </div>
+          </div>
+          <div class="agenda-item">
+            <span class="item-number">03</span>
+            <div class="item-icon">
+              <i class="fa-solid fa-network-wired"></i>
+            </div>
+            <div class="item-text">
+              <h3>시스템 아키텍처</h3>
+              <p>전체 구조 및 마이크로서비스</p>
+            </div>
+          </div>
+          <div class="agenda-item">
+            <span class="item-number">04</span>
+            <div class="item-icon">
+              <i class="fa-solid fa-code"></i>
+            </div>
+            <div class="item-text">
+              <h3>개발 내용</h3>
+              <p>기술 스택 및 DB 설계</p>
+            </div>
+          </div>
+        </div>
+        <!-- Right Column -->
+        <div class="column">
+          <div class="agenda-item">
+            <span class="item-number">05</span>
+            <div class="item-icon">
+              <i class="fa-solid fa-server"></i>
+            </div>
+            <div class="item-text">
+              <h3>인프라 구성</h3>
+              <p>AWS EKS, 네트워크, 모니터링</p>
+            </div>
+          </div>
+          <div class="agenda-item">
+            <span class="item-number">06</span>
+            <div class="item-icon">
+              <i class="fa-solid fa-microchip"></i>
+            </div>
+            <div class="item-text">
+              <h3>핵심 기술 및 특징</h3>
+              <p>MSA, 이벤트 기반, 고가용성</p>
+            </div>
+          </div>
+          <div class="agenda-item">
+            <span class="item-number">07</span>
+            <div class="item-icon">
+              <i class="fa-solid fa-chart-line"></i>
+            </div>
+            <div class="item-text">
+              <h3>성과 및 향후 계획</h3>
+              <p>기술적 성과와 로드맵</p>
+            </div>
+          </div>
+          <div class="agenda-item">
+            <span class="item-number">08</span>
+            <div class="item-icon">
+              <i class="fa-regular fa-comments"></i>
+            </div>
+            <div class="item-text">
+              <h3>Q&amp;A</h3>
+              <p>질의 응답</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Navigation Bar - 페이지 오른쪽 하단 -->
+    <div class="nav-bar">
+      <button
+        class="nav-button"
+        onclick="window.goToPreviousSlide()"
+        id="prevBtn"
+        title="이전 슬라이드"
+      >
+        <i class="fa-solid fa-chevron-left"></i>
+      </button>
+      <div class="nav-page-info">
+        <span id="currentPage">2</span> / <span id="totalPages">19</span>
+      </div>
+      <button
+        class="nav-button"
+        onclick="window.goToNextSlide()"
+        id="nextBtn"
+        title="다음 슬라이드"
+      >
+        <i class="fa-solid fa-chevron-right"></i>
+      </button>
+    </div>
+    <script src="../assets/js/navigation.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const current = window.getCurrentSlideNumber();
+        const total = window.getTotalSlides();
+        document.getElementById("currentPage").textContent = current;
+        document.getElementById("totalPages").textContent = total;
+        if (current === 1) document.getElementById("prevBtn").disabled = true;
+        if (current === total)
+          document.getElementById("nextBtn").disabled = true;
+      });
+    </script>
+  </body>
+</html>

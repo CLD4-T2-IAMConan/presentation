@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Deployment Strategy &amp; CI/CD</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&amp;family=JetBrains+Mono:wght@400;700&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Noto Sans KR", sans-serif;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        background-color: #0f172a;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+      }
+      .slide-container {
+        width: 1280px;
+        height: 720px;
+        background-color: #0f172a;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        overflow: visible;
+      }
+
+      /* Background Elements */
+      .bg-pattern {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0.03;
+        z-index: 0;
+        background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      }
+      .decor-circle {
+        position: absolute;
+        border-radius: 50%;
+        z-index: 1;
+        filter: blur(80px);
+      }
+      .circle-1 {
+        width: 500px;
+        height: 500px;
+        background-color: #3b82f6;
+        opacity: 0.04;
+        top: -100px;
+        right: -100px;
+      }
+      .circle-2 {
+        width: 300px;
+        height: 300px;
+        background-color: #8b5cf6;
+        opacity: 0.04;
+        bottom: 50px;
+        left: -50px;
+      }
+
+      /* Header */
+      .header-section {
+        padding: 50px 80px 10px 80px;
+        z-index: 10;
+      }
+
+      .section-tag {
+        background-color: rgba(139, 92, 246, 0.1);
+        color: #a78bfa;
+        padding: 6px 12px;
+        border-radius: 4px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        display: inline-block;
+        margin-bottom: 15px;
+        border: 1px solid rgba(139, 92, 246, 0.2);
+      }
+
+      .main-title {
+        font-size: 2.8rem;
+        font-weight: 900;
+        color: #f8fafc;
+        margin: 0;
+        line-height: 1.2;
+      }
+
+      /* Timeline Section */
+      .content-section {
+        flex: 1;
+        padding: 0 80px;
+        z-index: 10;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+
+      .timeline-wrapper {
+        position: relative;
+        padding: 40px 0;
+        margin-top: 20px;
+      }
+
+      /* The horizontal line */
+      .timeline-line {
+        position: absolute;
+        top: 50%;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background-color: rgba(71, 85, 105, 0.3);
+        transform: translateY(-50%);
+        z-index: 0;
+        border-radius: 2px;
+      }
+
+      /* Active progress line simulation */
+      .timeline-progress {
+        position: absolute;
+        top: 50%;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(
+          90deg,
+          #3b82f6 0%,
+          #8b5cf6 50%,
+          #10b981 100%
+        );
+        transform: translateY(-50%);
+        z-index: 0;
+        border-radius: 2px;
+        opacity: 0.5;
+      }
+
+      .steps-container {
+        display: flex;
+        justify-content: space-between;
+        position: relative;
+        z-index: 1;
+      }
+
+      .step-item {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+        min-width: 0; /* Prevents overflow */
+      }
+
+      /* Step Node (Circle) */
+      .step-node {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background-color: #0f172a;
+        border: 3px solid #475569;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #94a3b8;
+        font-size: 1.1rem;
+        margin-bottom: 20px; /* Space for content below if bottom aligned */
+        margin-top: 20px; /* Space for content above if top aligned */
+        z-index: 2;
+        transition: all 0.3s ease;
+        box-shadow: 0 0 0 5px rgba(15, 23, 42, 0.5);
+      }
+
+      /* Active/Completed Step Styles */
+      .step-item.ci .step-node {
+        border-color: #3b82f6;
+        color: #60a5fa;
+        box-shadow: 0 0 15px rgba(59, 130, 246, 0.3),
+          0 0 0 5px rgba(15, 23, 42, 0.8);
+      }
+
+      .step-item.cd .step-node {
+        border-color: #8b5cf6;
+        color: #a78bfa;
+        box-shadow: 0 0 15px rgba(139, 92, 246, 0.3),
+          0 0 0 5px rgba(15, 23, 42, 0.8);
+      }
+
+      .step-item.deploy .step-node {
+        border-color: #10b981;
+        color: #34d399;
+        box-shadow: 0 0 15px rgba(16, 185, 129, 0.3),
+          0 0 0 5px rgba(15, 23, 42, 0.8);
+      }
+
+      /* Step Card (Content) */
+      .step-card {
+        position: absolute;
+        width: 160px;
+        background-color: rgba(30, 41, 59, 0.6);
+        border: 1px solid rgba(148, 163, 184, 0.1);
+        border-radius: 12px;
+        padding: 15px;
+        backdrop-filter: blur(5px);
+        text-align: center;
+        transition: transform 0.3s ease;
+      }
+
+      .step-item:hover .step-card {
+        transform: scale(1.05);
+        background-color: rgba(30, 41, 59, 0.9);
+        border-color: rgba(255, 255, 255, 0.1);
+        z-index: 10;
+      }
+
+      /* Positioning cards alternatively top and bottom */
+      .step-item:nth-child(odd) .step-card {
+        bottom: 60px; /* Position above line */
+      }
+
+      .step-item:nth-child(odd) .step-node {
+        margin-top: 0;
+        margin-bottom: 0;
+      }
+
+      .step-item:nth-child(even) .step-card {
+        top: 60px; /* Position below line */
+      }
+
+      .step-item:nth-child(even) .step-node {
+        margin-top: 0;
+        margin-bottom: 0;
+      }
+
+      /* Connector Lines for cards */
+      .step-item:nth-child(odd) .step-card::after {
+        content: "";
+        position: absolute;
+        bottom: -8px;
+        left: 50%;
+        transform: translateX(-50%);
+        border-left: 8px solid transparent;
+        border-right: 8px solid transparent;
+        border-top: 8px solid rgba(30, 41, 59, 0.6);
+      }
+
+      .step-item:nth-child(even) .step-card::before {
+        content: "";
+        position: absolute;
+        top: -8px;
+        left: 50%;
+        transform: translateX(-50%);
+        border-left: 8px solid transparent;
+        border-right: 8px solid transparent;
+        border-bottom: 8px solid rgba(30, 41, 59, 0.6);
+      }
+
+      .card-title {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #f1f5f9;
+        margin-bottom: 6px;
+      }
+
+      .card-desc {
+        font-size: 0.8rem;
+        color: #94a3b8;
+        line-height: 1.4;
+      }
+
+      .card-tool {
+        margin-top: 8px;
+        display: inline-block;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.75rem;
+        padding: 2px 6px;
+        border-radius: 4px;
+        background-color: rgba(15, 23, 42, 0.5);
+        color: #cbd5e1;
+      }
+
+      /* Zone Labels */
+      .zone-labels {
+        display: flex;
+        margin-top: 130px; /* Adjust based on bottom cards */
+        border-top: 1px dashed rgba(148, 163, 184, 0.2);
+        padding-top: 20px;
+      }
+
+      .zone {
+        flex: 1;
+        text-align: center;
+        font-size: 0.9rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+      }
+
+      .zone.ci-zone {
+        color: #60a5fa;
+        border-right: 1px dashed rgba(148, 163, 184, 0.2);
+      }
+      .zone.cd-zone {
+        color: #a78bfa;
+        border-right: 1px dashed rgba(148, 163, 184, 0.2);
+      }
+      .zone.ops-zone {
+        color: #34d399;
+      }
+
+      /* Security Note Box */
+      .security-note {
+        margin-top: 30px;
+        background-color: rgba(30, 41, 59, 0.4);
+        border: 1px solid rgba(251, 191, 36, 0.3); /* Amber border */
+        border-radius: 8px;
+        padding: 15px 20px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+      }
+
+      .note-icon {
+        color: #fbbf24;
+        font-size: 1.2rem;
+        background-color: rgba(251, 191, 36, 0.1);
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .note-content h4 {
+        color: #fcd34d;
+        margin: 0 0 2px 0;
+        font-size: 0.95rem;
+      }
+
+      .note-content p {
+        color: #94a3b8;
+        margin: 0;
+        font-size: 0.85rem;
+      }
+
+      .page-indicator {
+        position: absolute;
+        bottom: 30px;
+        right: 40px;
+        color: #475569;
+        font-size: 0.9rem;
+        font-weight: 500;
+      }
+
+      /* Navigation Bar - 오른쪽 하단에 조용하게 */
+      .nav-bar {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background-color: rgba(15, 23, 42, 0.6);
+        border: 1px solid rgba(148, 163, 184, 0.15);
+        border-radius: 12px;
+        padding: 8px 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        z-index: 1000;
+        backdrop-filter: blur(8px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        opacity: 0.7;
+        transition: opacity 0.3s ease;
+      }
+
+      .nav-bar:hover {
+        opacity: 1;
+      }
+
+      .nav-button {
+        background-color: transparent;
+        border: none;
+        color: #94a3b8;
+        padding: 6px 10px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.85rem;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-family: "Noto Sans KR", sans-serif;
+        min-width: auto;
+      }
+
+      .nav-button:hover:not(:disabled) {
+        background-color: rgba(59, 130, 246, 0.15);
+        color: #60a5fa;
+      }
+
+      .nav-button:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+      }
+
+      .nav-page-info {
+        color: #64748b;
+        font-size: 0.8rem;
+        font-weight: 500;
+        padding: 0 8px;
+        white-space: nowrap;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="slide-container">
+      <!-- Background Elements -->
+      <div class="bg-pattern"></div>
+      <div class="decor-circle circle-1"></div>
+      <div class="decor-circle circle-2"></div>
+      <!-- Header -->
+      <div class="header-section" style="padding-bottom: 48px">
+        <div class="section-tag">CI/CD PIPELINE</div>
+        <h1 class="main-title">배포 전략 및 CI/CD (GitOps)</h1>
+      </div>
+      <!-- Timeline Content -->
+      <div class="content-section" style="margin-top: 32px">
+        <div class="timeline-wrapper">
+          <!-- Line -->
+          <div class="timeline-line"></div>
+          <div class="timeline-progress"></div>
+          <!-- Steps -->
+          <div class="steps-container">
+            <!-- Step 1: Push -->
+            <div class="step-item ci">
+              <div class="step-card">
+                <h3 class="card-title">Code Push</h3>
+                <p class="card-desc">
+                  개발자가 기능 구현 후 코드를 원격 저장소에 푸시
+                </p>
+                <span class="card-tool">GitHub Repo</span>
+              </div>
+              <div class="step-node">
+                <i class="fa-brands fa-github"></i>
+              </div>
+            </div>
+            <!-- Step 2: Test & Build -->
+            <div class="step-item ci">
+              <div class="step-node">
+                <i class="fa-solid fa-gears"></i>
+              </div>
+              <div class="step-card">
+                <h3 class="card-title">CI Pipeline</h3>
+                <p class="card-desc">테스트 자동 실행 및 Docker 이미지 빌드</p>
+                <span class="card-tool">GitHub Actions</span>
+              </div>
+            </div>
+            <!-- Step 3: Image Registry -->
+            <div class="step-item ci">
+              <div class="step-card">
+                <h3 class="card-title">Image Push</h3>
+                <p class="card-desc">
+                  빌드된 컨테이너 이미지를 레지스트리에 저장
+                </p>
+                <span class="card-tool">GHCR / ECR</span>
+              </div>
+              <div class="step-node">
+                <i class="fa-solid fa-container-storage"></i>
+              </div>
+            </div>
+            <!-- Step 4: Detect Changes -->
+            <div class="step-item cd">
+              <div class="step-node">
+                <i class="fa-solid fa-eye"></i>
+              </div>
+              <div class="step-card">
+                <h3 class="card-title">Sync Detect</h3>
+                <p class="card-desc">
+                  Git 저장소의 Manifest 변경 사항 자동 감지
+                </p>
+                <span class="card-tool">ArgoCD</span>
+              </div>
+            </div>
+            <!-- Step 5: Deployment -->
+            <div class="step-item cd">
+              <div class="step-card">
+                <h3 class="card-title">App Deploy</h3>
+                <p class="card-desc">Helm Chart 기반으로 EKS 클러스터에 배포</p>
+                <span class="card-tool">Kubernetes</span>
+              </div>
+              <div class="step-node">
+                <i class="fa-solid fa-rocket"></i>
+              </div>
+            </div>
+            <!-- Step 6: Health Check -->
+            <div class="step-item deploy">
+              <div class="step-node">
+                <i class="fa-solid fa-heart-pulse"></i>
+              </div>
+              <div class="step-card">
+                <h3 class="card-title">Manage</h3>
+                <p class="card-desc">상태 모니터링 및 문제 발생 시 자동 롤백</p>
+                <span class="card-tool">Self-Healing</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Zone Indicators -->
+        <div class="zone-labels">
+          <div class="zone ci-zone">
+            <i class="fa-solid fa-code"></i> Continuous Integration
+          </div>
+          <div class="zone cd-zone">
+            <i class="fa-solid fa-arrows-rotate"></i> Continuous Delivery
+          </div>
+          <div class="zone ops-zone">
+            <i class="fa-solid fa-server"></i> Operations
+          </div>
+        </div>
+        <!-- Security Note -->
+        <div class="security-note">
+          <div class="note-icon">
+            <i class="fa-solid fa-shield-halved"></i>
+          </div>
+          <div class="note-content">
+            <h4>Security Enhanced</h4>
+            <p>
+              IRSA(IAM Roles for Service Accounts)를 적용하여 CI/CD 파이프라인
+              및 Pod의 AWS 리소스 접근 권한을 최소화하고, GitHub OIDC를 통해
+              인증 보안을 강화했습니다.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Navigation Bar - 페이지 오른쪽 하단 -->
+    <div class="nav-bar">
+      <button
+        class="nav-button"
+        onclick="window.goToPreviousSlide()"
+        id="prevBtn"
+        title="이전 슬라이드"
+      >
+        <i class="fa-solid fa-chevron-left"></i>
+      </button>
+      <div class="nav-page-info">
+        <span id="currentPage">15</span> / <span id="totalPages">19</span>
+      </div>
+      <button
+        class="nav-button"
+        onclick="window.goToNextSlide()"
+        id="nextBtn"
+        title="다음 슬라이드"
+      >
+        <i class="fa-solid fa-chevron-right"></i>
+      </button>
+    </div>
+    <script src="../assets/js/navigation.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const current = window.getCurrentSlideNumber();
+        const total = window.getTotalSlides();
+        document.getElementById("currentPage").textContent = current;
+        document.getElementById("totalPages").textContent = total;
+        if (current === 1) document.getElementById("prevBtn").disabled = true;
+        if (current === total)
+          document.getElementById("nextBtn").disabled = true;
+      });
+    </script>
+  </body>
+</html>
