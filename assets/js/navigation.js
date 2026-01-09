@@ -54,8 +54,10 @@
     // 다음 슬라이드로 이동
     function goToNextSlide() {
         const current = getCurrentSlideNumber();
-        if (current && current < slides.length) {
-            navigateToSlide(current + 1);
+        // current가 null이면 1로 가정 (첫 번째 슬라이드)
+        const slideNum = current || 1;
+        if (slideNum < slides.length) {
+            navigateToSlide(slideNum + 1);
         }
     }
 
@@ -77,43 +79,52 @@
     }
 
     // 키보드 이벤트 리스너
-    document.addEventListener('keydown', function(event) {
-        // 입력 필드에 포커스가 있을 때는 네비게이션 무시
-        const activeElement = document.activeElement;
-        if (activeElement && (
-            activeElement.tagName === 'INPUT' ||
-            activeElement.tagName === 'TEXTAREA' ||
-            activeElement.isContentEditable
-        )) {
-            return;
-        }
+    function setupKeyboardNavigation() {
+        document.addEventListener('keydown', function(event) {
+            // 입력 필드에 포커스가 있을 때는 네비게이션 무시
+            const activeElement = document.activeElement;
+            if (activeElement && (
+                activeElement.tagName === 'INPUT' ||
+                activeElement.tagName === 'TEXTAREA' ||
+                activeElement.isContentEditable
+            )) {
+                return;
+            }
 
-        switch(event.key) {
-            case 'ArrowLeft':
-            case 'PageUp':
-                event.preventDefault();
-                goToPreviousSlide();
-                break;
-            case 'ArrowRight':
-            case ' ':
-            case 'PageDown':
-                event.preventDefault();
-                goToNextSlide();
-                break;
-            case 'Home':
-                event.preventDefault();
-                goToFirstSlide();
-                break;
-            case 'End':
-                event.preventDefault();
-                goToLastSlide();
-                break;
-            case 'Escape':
-                event.preventDefault();
-                goToIndex();
-                break;
-        }
-    });
+            switch(event.key) {
+                case 'ArrowLeft':
+                case 'PageUp':
+                    event.preventDefault();
+                    goToPreviousSlide();
+                    break;
+                case 'ArrowRight':
+                case ' ':
+                case 'PageDown':
+                    event.preventDefault();
+                    goToNextSlide();
+                    break;
+                case 'Home':
+                    event.preventDefault();
+                    goToFirstSlide();
+                    break;
+                case 'End':
+                    event.preventDefault();
+                    goToLastSlide();
+                    break;
+                case 'Escape':
+                    event.preventDefault();
+                    goToIndex();
+                    break;
+            }
+        });
+    }
+
+    // DOM이 로드되면 키보드 네비게이션 설정
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', setupKeyboardNavigation);
+    } else {
+        setupKeyboardNavigation();
+    }
 
     // 전역 함수로 노출 (버튼에서 사용)
     window.navigateToSlide = navigateToSlide;
