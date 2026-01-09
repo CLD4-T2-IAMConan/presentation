@@ -1,0 +1,9 @@
+# Netlify
+.netlify/
+
+# MacOS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
